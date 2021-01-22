@@ -19,10 +19,10 @@ class CreateVerificationsTable extends Migration
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->string('date_of_birth');
+            $table->date('date_of_birth');
             $table->enum('gender',['male','female']);
             $table->string('address');
-            $table->integer('mobile_no');
+            $table->bigInteger('mobile_no');
 //            $table->enum('document_type',['nid','passport']);
             $table->enum('borrower_type',['salaried','self'])->nullable();
             $table->string('division');

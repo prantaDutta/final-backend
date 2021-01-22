@@ -2,22 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-// Authenticated Routes
-Route::group(['middleware' => ['auth:sanctum']], static function () {
-    // get current user
-    Route::get('/user', static function(Request $request) {
-        return $request->user();
-    });
-    // verify an user
-    Route::post('/verify', [UserController::class, 'verifyUser']);
-});
-
-//Route::middleware('auth:sanctum')->get('/user', static function (Request $request) {
-//    return $request->user();
-//});
 
 Route::group(['middleware' => ['web']], static function () {
     // Auth Routes
@@ -31,3 +16,4 @@ Route::group(['middleware' => ['web']], static function () {
     // Checking Unique Email Excluding Id
     Route::post('/unique-email-excluding-id', [UserController::class, 'uniqueEmailExcludingId']);
 });
+

@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\Verification
@@ -19,34 +22,34 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $zila
  * @property int $zip_code
  * @property mixed $verification_photos
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User $user
- * @method static \Illuminate\Database\Eloquent\Builder|Verification newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Verification newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Verification query()
- * @method static \Illuminate\Database\Eloquent\Builder|Verification whereAddress($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Verification whereBorrowerType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Verification whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Verification whereDateOfBirth($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Verification whereDocumentType($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Verification whereGender($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Verification whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Verification whereMobileNo($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Verification whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Verification whereUserId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Verification whereVerificationPhotos($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Verification whereZila($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Verification whereZipCode($value)
- * @mixin \Eloquent
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $user
+ * @method static Builder|Verification newModelQuery()
+ * @method static Builder|Verification newQuery()
+ * @method static Builder|Verification query()
+ * @method static Builder|Verification whereAddress($value)
+ * @method static Builder|Verification whereBorrowerType($value)
+ * @method static Builder|Verification whereCreatedAt($value)
+ * @method static Builder|Verification whereDateOfBirth($value)
+ * @method static Builder|Verification whereDocumentType($value)
+ * @method static Builder|Verification whereGender($value)
+ * @method static Builder|Verification whereId($value)
+ * @method static Builder|Verification whereMobileNo($value)
+ * @method static Builder|Verification whereUpdatedAt($value)
+ * @method static Builder|Verification whereUserId($value)
+ * @method static Builder|Verification whereVerificationPhotos($value)
+ * @method static Builder|Verification whereZila($value)
+ * @method static Builder|Verification whereZipCode($value)
+ * @mixin Eloquent
  * @property string $division
- * @method static \Illuminate\Database\Eloquent\Builder|Verification whereDivision($value)
+ * @method static Builder|Verification whereDivision($value)
  */
 class Verification extends Model
 {
     use HasFactory;
 
-    protected $guarded =[];
+    protected $guarded = [];
 
     # this is for fetching the user with verification
     # verification and user has one to one relation
