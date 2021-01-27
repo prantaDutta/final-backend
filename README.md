@@ -1,11 +1,52 @@
-1- execute composer install
+## Important 
+##### This repository serves as the backend of [this](https://github.com/prantaDutta/final-frontend) project.
 
-2- rename .env.example to .env command: copy .env.example .env
+### Step 1
+- First Install the Composer packages
+```$xslt
+    composer install
+```
 
-3- update it with your database credentials
+### Step 2
+- Rename .env.example to .env
+- You can also do that with following command 
+```$xslt
+    copy .env.example .env
+```
 
-4- php artisan key:generate
+### Step 3
+- Update the env file with your database credentials
 
-5- php artisan migrate
+### Step 4
+ - Generate a Key. Run the following: 
+ ```$xslt
+    php artisan key:generate
+```
 
-6- php artisan serve
+### Step 5
+ - Migrate the database
+ ```$xslt
+    php artisan migrate
+```
+
+### Step 6
+ - Now we need to add this to your env file
+ ```$xslt
+    # for laravel sanctum
+    SANCTUM_STATEFUL_DOMAINS=localhost:3000
+    SESSION_DOMAIN=localhost
+    
+    # To Redirect To Login
+    FRONT_END_URL=http://localhost:3000
+    
+    # SSLCommerz credentials
+    STORE_ID= // this is secret, lol
+    STORE_PASSWORD=  // sry, no can do
+```
+
+### Step 7
+  - Now Run the development server
+```$xslt
+    php artisan serve
+```   
+ 
