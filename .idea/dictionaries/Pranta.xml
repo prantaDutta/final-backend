@@ -2,7 +2,9 @@
   <dictionary name="Pranta">
     <words>
       <w>commerz</w>
+      <w>lcfirst</w>
       <w>zila</w>
+      <w>zilas</w>
     </words>
   </dictionary>
 </component>

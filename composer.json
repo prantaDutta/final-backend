@@ -15,7 +15,8 @@
         "laravel/framework": "^8.12",
         "laravel/sanctum": "^2.8",
         "laravel/tinker": "^2.5",
-        "ext-json": "*"
+        "ext-json": "*",
+      "ext-curl": "*"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",

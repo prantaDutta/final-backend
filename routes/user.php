@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\LoanController;
+use App\Http\Controllers\SslCommerzPaymentController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -11,8 +14,11 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
 
     // get current user
     Route::get('/', static function (Request $request) {
-        return $request->user();
+        return new UserResource($request->user());
     });
+
+    // getting the user with verification
+    Route::get('/user-with-verification', [UserController::class, 'userWithVerificationData']);
 
     // verify an user
     Route::post('/verify', [VerificationController::class, 'verifyUser']);
@@ -22,4 +28,7 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
 
     // get all Loans
     Route::post('/all-loans', [LoanController::class, 'getAllLoans']);
+
+    // Deposit Routes
+    Route::get('/deposit', [SslCommerzPaymentController::class, 'exampleEasyCheckout']);
 });

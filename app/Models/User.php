@@ -48,6 +48,8 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property-read Verification|null $verification
  * @property-read Collection|\App\Models\Loan[] $loans
  * @property-read int|null $loans_count
+ * @property-read Collection|\App\Models\Transaction[] $transactions
+ * @property-read int|null $transactions_count
  */
 
 class User extends Authenticatable
@@ -96,5 +98,11 @@ class User extends Authenticatable
     public function loans()
     {
         return $this->belongsToMany(Loan::class);
+    }
+
+    # User and Transaction have a one to many relation
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
     }
 }

@@ -11,7 +11,7 @@ use App\Models\User;
 class AdminController extends Controller
 {
     // getting all the verification requests
-    public function getAllVerificationRequests($requestType)
+    public function getAllVerificationRequests()
     {
         $user = User::where('verified', 'pending')->get();
         if ($user) {
