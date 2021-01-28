@@ -37,6 +37,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|Transaction whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Transaction whereUserId($value)
  * @mixin \Eloquent
+ * @property string|null $transaction_type
+ * @method static \Illuminate\Database\Eloquent\Builder|Transaction whereTransactionType($value)
  */
 class Transaction extends Model
 {

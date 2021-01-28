@@ -31,4 +31,7 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
 
     // Deposit Routes
     Route::get('/deposit', [SslCommerzPaymentController::class, 'exampleEasyCheckout']);
+
+    // Get All Deposit Transactions
+    Route::get('/get-all-deposits/{id}', [\App\Http\Controllers\TransactionController::class, 'getAllDeposits']);
 });

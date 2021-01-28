@@ -22,7 +22,16 @@ class TransactionFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'user_id' => mt_rand(1, 100),
+            'name' => $this->faker->name,
+            'email' => $this->faker->email,
+            'phone' => $this->faker->phoneNumber,
+            'amount' => mt_rand(1000, 9999),
+            'status' => mt_rand(0, 2) === 0 ? "Pending" : "Completed",
+            'address' => $this->faker->address,
+            'transaction_id' => uniqid('', true),
+            'transaction_type' => mt_rand(0, 1) === 0 ? "deposit" : "withdraw",
+            'currency' => "BDT",
         ];
     }
 }

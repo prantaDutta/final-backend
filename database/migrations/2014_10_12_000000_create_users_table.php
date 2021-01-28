@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->enum('role', ['admin', 'lender', 'borrower']);
             $table->enum('verified', ['yes', 'no', 'pending'])->default('no');
+            $table->double('balance',12,2)->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

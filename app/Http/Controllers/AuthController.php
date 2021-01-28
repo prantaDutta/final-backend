@@ -28,6 +28,8 @@ class AuthController extends Controller
             'email' => $request->email,
             'name' => $request->name,
             'role' => $request->role,
+            'verified' => 'no',
+            'balance' => 0.00,
             'password' => Hash::make($request->password)
         ]);
 

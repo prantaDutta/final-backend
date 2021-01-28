@@ -28,6 +28,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => '$2y$10$/huF2ZU4xHaZfzUgFjJQn.dPAxVXhTIWx2ccuXH4ySDRwdaFW4Wie', // 12345678
             'role' => mt_rand(0,1)=== 0 ? 'lender' : 'borrower',
+            'balance' => 0.00,
             'verified' => 'pending'
         ];
     }

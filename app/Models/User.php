@@ -50,6 +50,8 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property-read int|null $loans_count
  * @property-read Collection|\App\Models\Transaction[] $transactions
  * @property-read int|null $transactions_count
+ * @property float|null $balance
+ * @method static Builder|User whereBalance($value)
  */
 
 class User extends Authenticatable

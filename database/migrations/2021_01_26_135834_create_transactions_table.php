@@ -22,9 +22,9 @@ class CreateTransactionsTable extends Migration
             $table->string('name')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            $table->double('amount')->nullable();
+            $table->decimal('amount')->nullable();
             $table->longText('address')->nullable();
-            $table->enum('status',['Pending','Processing','Complete','Failed','Canceled'])->nullable();
+            $table->enum('status',['Pending','Completed','Failed','Canceled'])->nullable();
             $table->string('transaction_id')->nullable();
             $table->enum('transaction_type',['deposit','withdraw'])->nullable();
             $table->string('currency')->nullable();
