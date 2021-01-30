@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Library\SslCommerz\SslCommerzNotification;
+use App\Models\Transaction;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -179,9 +180,18 @@ class SslCommerzPaymentController extends Controller
     {
         echo "Transaction is Successful";
 
-        $tran_id = $request->input('tran_id');
-        $amount = $request->input('amount');
-        $currency = $request->input('currency');
+        // getting sslcommerz data
+        list($tran_id,
+            $amount,
+            $currency,
+            $card_type,
+            $card_no,
+            $bank_tran_id,
+            $error,
+            $card_issuer,
+            $card_brand,
+            $risk_level,
+            $risk_title) = $this->getting_data_from_sslcommerz($request);
 
         $sslc = new SslCommerzNotification();
 
@@ -211,6 +221,19 @@ class SslCommerzPaymentController extends Controller
 
                 $user->update([
                     'balance' => $user->balance + $transaction->amount
+                ]);
+
+                // Saving the data to the transaction Details table
+                $current_transaction = Transaction::where('transaction_id', $tran_id)->first();
+                $current_transaction->transaction_detail()->updateOrCreate([
+                    'card_type' => $card_type,
+                    'card_no' => $card_no,
+                    'bank_tran_id' => $bank_tran_id,
+                    'error' => $error,
+                    'card_issuer' => $card_issuer,
+                    'card_brand' => $card_brand,
+                    'risk_level' => $risk_level,
+                    'risk_title' => $risk_title
                 ]);
 
                 echo "<br >Transaction is successfully Completed. Redirecting, Please Wait";
@@ -243,28 +266,63 @@ class SslCommerzPaymentController extends Controller
 
     }
 
+    private function getting_data_from_sslcommerz(Request $request)
+    {
+        # getting all the returned data from sslcommerz
+        return [
+            $tran_id = $request->input('tran_id'),
+            $amount = $request->input('amount'),
+            $currency = $request->input('currency'),
+            $card_type = $request->input('card_type'),
+            $card_no = $request->input('card_no'),
+            $bank_tran_id = $request->input('bank_tran_id'),
+            $error = $request->input('error'),
+            $card_issuer = $request->input('card_issuer'),
+            $card_brand = $request->input('card_brand'),
+            $risk_level = $request->input('risk_level'),
+            $risk_title = $request->input('risk_title'),
+        ];
+    }
+
     public function fail(Request $request)
     {
-        $tran_id = $request->input('tran_id');
+        # getting sslcommerz data
+        list($tran_id,
+            $amount,
+            $currency,
+            $card_type,
+            $card_no,
+            $bank_tran_id,
+            $error,
+            $card_issuer,
+            $card_brand,
+            $risk_level,
+            $risk_title) = $this->getting_data_from_sslcommerz($request);
 
         $user = $request->user();
         $order_details = $user->transactions()
             ->where('transaction_id', $tran_id)
             ->select('transaction_id', 'status', 'currency', 'amount')->first();
 
-//        $order_details = DB::table('transactions')
-//            ->where('transaction_id', $tran_id)
-//            ->select('transaction_id', 'status', 'currency', 'amount')->first();
-
         if ($order_details->status === 'Pending') {
-//            $update_product = DB::table('transactions')
-//                ->where('transaction_id', $tran_id)
-//                ->update(['status' => 'Failed']);
-
-            $update_product = $user->transactions()
+            $user->transactions()
                 ->where('transaction_id', $tran_id)
                 ->update(['status' => 'Failed']);
-            echo "Transaction is Failed";
+
+            // Saving the data to the transaction Details table
+            $current_transaction = Transaction::where('transaction_id', $tran_id)->first();
+            $current_transaction->transaction_detail()->updateOrCreate([
+                'card_type' => $card_type,
+                'card_no' => $card_no,
+                'bank_tran_id' => $bank_tran_id,
+                'error' => $error,
+                'card_issuer' => $card_issuer,
+                'card_brand' => $card_brand,
+                'risk_level' => $risk_level,
+                'risk_title' => $risk_title
+            ]);
+
+            echo "Transaction Failed";
         } else if ($order_details->status === 'Completed') {
             echo "Transaction is already Successful. Redirecting, Please wait.....";
             sleep(2);
@@ -278,26 +336,42 @@ class SslCommerzPaymentController extends Controller
 
     public function cancel(Request $request)
     {
-        $tran_id = $request->input('tran_id');
+        list($tran_id,
+            $amount,
+            $currency,
+            $card_type,
+            $card_no,
+            $bank_tran_id,
+            $error,
+            $card_issuer,
+            $card_brand,
+            $risk_level,
+            $risk_title) = $this->getting_data_from_sslcommerz($request);
 
         $user = $request->user();
         $order_details = $user->transactions()
             ->where('transaction_id', $tran_id)
             ->select('transaction_id', 'status', 'currency', 'amount')->first();
 
-//        $order_details = DB::table('transactions')
-//            ->where('transaction_id', $tran_id)
-//            ->select('transaction_id', 'status', 'currency', 'amount')->first();
-
         if ($order_details->status === 'Pending') {
-//            $update_product = DB::table('transactions')
-//                ->where('transaction_id', $tran_id)
-//                ->update(['status' => 'Canceled']);
-
-            $update_product = $user->transactions()
+            $user->transactions()
                 ->where('transaction_id', $tran_id)
                 ->update(['status' => 'Canceled']);
-            echo "Transaction is Cancel";
+
+            // Saving the data to the transaction Details table
+            $current_transaction = Transaction::where('transaction_id', $tran_id)->first();
+            $current_transaction->transaction_detail()->updateOrCreate([
+                'card_type' => $card_type,
+                'card_no' => $card_no,
+                'bank_tran_id' => $bank_tran_id,
+                'error' => $error,
+                'card_issuer' => $card_issuer,
+                'card_brand' => $card_brand,
+                'risk_level' => $risk_level,
+                'risk_title' => $risk_title
+            ]);
+
+            echo "Transaction Canceled";
         } else if ($order_details->status === 'Completed') {
             echo "Transaction is already Successful. Redirecting, Please wait.....";
             sleep(2);
@@ -359,5 +433,4 @@ class SslCommerzPaymentController extends Controller
             echo "Invalid Data";
         }
     }
-
 }

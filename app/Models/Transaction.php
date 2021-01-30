@@ -39,6 +39,7 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin \Eloquent
  * @property string|null $transaction_type
  * @method static \Illuminate\Database\Eloquent\Builder|Transaction whereTransactionType($value)
+ * @property-read \App\Models\TransactionDetail|null $transaction_detail
  */
 class Transaction extends Model
 {
@@ -46,7 +47,14 @@ class Transaction extends Model
 
     protected $fillable = ['name','email','amount','phone','address','status','transaction_id','currency', 'transaction_type'];
 
+    # User and Transaction have a one to one relation
     public function user() {
         return $this->belongsTo(User::class);
+    }
+
+    # Transaction and Transaction Details have a one to one relation
+    public function transaction_detail()
+    {
+        return $this->hasOne(TransactionDetail::class);
     }
 }

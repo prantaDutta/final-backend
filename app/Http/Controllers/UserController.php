@@ -29,9 +29,9 @@ class UserController extends Controller
     // checks for unique Email excluding id
     public function uniqueEmailExcludingId(Request $request)
     {
-        $user = User::where('email', $request->email)->first();
-        if (!$user || $user->id === $request->id) {
-            return abort(422);
+        $user = User::where('email', $request->get('email'))->first();
+        if (!$user || $user->id === $request->get('id')) {
+            return response('ERROR', 422);
         }
         return response('OK', 200);
     }

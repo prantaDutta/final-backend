@@ -13,8 +13,4 @@ Route::group(['middleware' => ['web']], static function () {
 
     // Checking Unique Email
     Route::post('/unique-email', [UserController::class, 'uniqueEmail']);
-
-    // Checking Unique Email Excluding Id
-    Route::post('/unique-email-excluding-id', [UserController::class, 'uniqueEmailExcludingId']);
 });
-

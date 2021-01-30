@@ -26,7 +26,7 @@ class VerificationController extends Controller
         $verification->borrower_type = $user->role === 'lender' ? null : $values['borrowerType'];
         $verification->date_of_birth = Carbon::parse($values['dateOfBirth'])->format('Y-m-d');
         $verification->gender = $values['gender'];
-        $verification->mobile_no = $values['mobileNo'];
+        $verification->mobile_no = '880' . $values['mobileNo'];
         $verification->zila = $values['zila'];
         $verification->division = $values['division'];
         $verification->zip_code = $values['zip_code'];
