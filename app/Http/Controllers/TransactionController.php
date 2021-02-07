@@ -34,7 +34,8 @@ class TransactionController extends Controller
         $user = User::find($id);
         $withdrawals = $user->transactions()
             ->where('user_id', $id)
-            ->where('transaction_type','withdraw')->get();
+            ->where('transaction_type','withdraw')
+            ->get();
 
         if ($withdrawals) {
             return response()->json([
@@ -51,8 +52,7 @@ class TransactionController extends Controller
     {
         $values = $request->get('values');
         $id = $request->get('id');
-
-        $uniq_id = uniqid('', true); // tran_id must be unique,
+        $trxID = $values['trxID'];
 
         # find the user first
         $user = User::find($id);
@@ -70,13 +70,13 @@ class TransactionController extends Controller
             'amount' => $values['amount'],
             'status' => 'Pending',
             'address' => $user->verification->address,
-            'transaction_id' => $uniq_id,
+            'transaction_id' => $trxID,
             'transaction_type' => 'withdraw',
             'currency' => "BDT"
         ]);
 
         // Saving the data to the transaction Details table
-        $current_transaction = Transaction::where('transaction_id',$uniq_id)->first();
+        $current_transaction = Transaction::where('transaction_id',$trxID)->first();
         $current_transaction->transaction_detail()->updateOrCreate([
             'card_type' => strtoupper($values['method'])."-".ucfirst($values['method']),
 //            'card_no' => "N/A",

@@ -17,6 +17,7 @@ class TransactionResource extends JsonResource
     {
 //        return parent::toArray($request);
         return [
+            'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
@@ -26,6 +27,7 @@ class TransactionResource extends JsonResource
             'transactionId' => $this->transaction_id,
             'transactionType' => $this->transaction_type,
             'currency' => $this->currency,
+            'createdAt' => $this->created_at
         ];
     }
 }

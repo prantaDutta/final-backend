@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\LoanResource;
+use App\Models\Loan;
 use App\Models\User;
 use Illuminate\Http\Request;
 

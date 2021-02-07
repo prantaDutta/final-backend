@@ -13,13 +13,13 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', static function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->enum('role', ['admin', 'lender', 'borrower']);
-            $table->enum('verified', ['yes', 'no', 'pending'])->default('no');
+            $table->enum('verified', ['verified', 'unverified', 'pending'])->default('unverified');
             $table->double('balance',12,2)->nullable();
             $table->string('password');
             $table->rememberToken();

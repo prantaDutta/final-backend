@@ -14,14 +14,29 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     });
 
     // get all verification requests
-    Route::get('/verification-requests', [AdminController::class, 'getAllVerificationRequests']);
+    Route::get('/users/{verified}', [AdminController::class, 'getUsers']);
 
     // get single verification requests
-    Route::get('/verification-requests/{id}', [AdminController::class, 'getSingleVerificationRequests']);
+    Route::get('/user/{id}', [AdminController::class, 'getSingleUser']);
 
     // make an account verified
-    Route::get('/verification-requests/verified/{id}', [AdminController::class, 'makeAccountVerified']);
+    Route::get('/user/{ifVerified}/{id}', [AdminController::class, 'makeAccountVerified']);
 
     // get all Loan Requests
-    Route::get('/loan-requests/{requestType}', [AdminController::class, 'getAllLoanRequests']);
+    Route::get('/loans/{requestType}', [AdminController::class, 'getAllLoans']);
+
+    // Fetching Admin Dashboard Data
+//    Route::get('/recent-data',[AdminController::class,'recentData']);
+
+    // Fetching Alternate Dashboard Data
+    Route::get('/dashboard-data',[AdminController::class,'dashboardData']);
+
+    // Getting All Transactions
+    Route::get('/transactions/{type}/{status}',[AdminController::class,'getTransactions']);
+
+    // Get Single Transaction Requests
+    Route::get('/transaction/{id}',[AdminController::class,'getSingleTransactions']);
+
+    // Transaction Successful Or Failed
+    Route::get('/transaction/{type}/{id}',[AdminController::class, 'markTransaction']);
 });

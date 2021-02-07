@@ -28,7 +28,7 @@ class AuthController extends Controller
             'email' => $request->email,
             'name' => $request->name,
             'role' => $request->role,
-            'verified' => 'no',
+            'verified' => 'unverified',
             'balance' => 0.00,
             'password' => Hash::make($request->password)
         ]);
@@ -73,7 +73,6 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        Cookie::forget('grayscale');
         return response('OK', 200);
     }
 }

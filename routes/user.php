@@ -44,4 +44,10 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
 
     // Withdraw
     Route::post('/withdraw', [TransactionController::class, 'withdraw']);
+
+    // Fetching Dashboard Data
+    Route::get('/recent-data',[UserController::class,'recentData']);
+
+    // Fetching Alternate Dashboard Data
+    Route::get('/dashboard-data',[UserController::class,'dashboardData']);
 });

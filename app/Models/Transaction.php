@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\Transaction
@@ -18,9 +19,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $status
  * @property string|null $transaction_id
  * @property string|null $currency
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User $user
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $user
  * @method static \Illuminate\Database\Eloquent\Builder|Transaction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Transaction newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Transaction query()
@@ -39,7 +40,7 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin \Eloquent
  * @property string|null $transaction_type
  * @method static \Illuminate\Database\Eloquent\Builder|Transaction whereTransactionType($value)
- * @property-read \App\Models\TransactionDetail|null $transaction_detail
+ * @property-read TransactionDetail|null $transaction_detail
  */
 class Transaction extends Model
 {
