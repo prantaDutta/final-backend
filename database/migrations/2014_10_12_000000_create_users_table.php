@@ -22,6 +22,7 @@ class CreateUsersTable extends Migration
             $table->enum('verified', ['verified', 'unverified', 'pending'])->default('unverified');
             $table->double('balance',12,2)->nullable();
             $table->string('password');
+            $table->enum('language',['English','বাংলা'])->default('English');
             $table->rememberToken();
             $table->timestamps();
         });

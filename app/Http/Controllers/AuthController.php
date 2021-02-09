@@ -17,7 +17,7 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
+            'password' => 'required|min:8',
             'role' => [
                 'required',
                 Rule::in(['lender', 'borrower']),

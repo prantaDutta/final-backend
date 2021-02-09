@@ -6,9 +6,11 @@ use App\Http\Resources\LoanResource;
 use App\Http\Resources\TransactionResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\VerificationResource;
-use App\Models\Loan;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Redirect;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -16,7 +18,7 @@ class UserController extends Controller
     public function login()
     {
         $url = config('app.frontEndUrl');
-        return \Redirect::to($url . '/login');
+        return Redirect::to($url . '/login');
     }
 
     // checks for unique Email
@@ -67,12 +69,12 @@ class UserController extends Controller
         $loans = $request->user()->loans;
         $transactions = $request->user()->transactions;
 
-        $ongoingLoans = $loans->where('loan_mode','ongoing')->count();
-        $processingLoans = $loans->where('loan_mode','processing')->count();
-        $finishedLoans = $loans->where('loan_mode','finished')->count();
+        $ongoingLoans = $loans->where('loan_mode', 'ongoing')->count();
+        $processingLoans = $loans->where('loan_mode', 'processing')->count();
+        $finishedLoans = $loans->where('loan_mode', 'finished')->count();
 
-        $deposits = $transactions->where('transaction_type','deposit')->count();
-        $withdrawals = $transactions->where('transaction_type','withdraw')->count();
+        $deposits = $transactions->where('transaction_type', 'deposit')->count();
+        $withdrawals = $transactions->where('transaction_type', 'withdraw')->count();
         return response()->json([
             'ongoing' => $ongoingLoans,
             'processing' => $processingLoans,
@@ -80,5 +82,104 @@ class UserController extends Controller
             'deposits' => $deposits,
             'withdrawals' => $withdrawals
         ]);
+    }
+
+    // update Personal Settings
+    public function updatePersonalSettings(Request $request, $info)
+    {
+        // Finding authenticated user
+        $user = User::find($request->user()->id);
+
+        // if address field is modified
+        if ($info === 'address') {
+            // Validating Address Fields
+            $request->validate([
+                'address' => 'required|string',
+                'division' => 'required|string',
+                'zila' => 'required|string',
+                'zipCode' => 'required|numeric'
+            ]);
+
+            // updating the database
+            $user->verification->update([
+                'address' => $request->get('address'),
+                'division' => $request->get('division'),
+                'zila' => $request->get('zila'),
+                'zip_code' => $request->get('zipCode')
+            ]);
+
+            return response()->json(["OK"],200);
+        }
+
+        // if mobile field is modified
+        if ($info === 'mobile') {
+            // Validating Mobile No
+            $request->validate([
+                'mobileNo' => 'required|numeric|digits:13',
+            ]);
+
+            // updating the database
+            $user->verification->update([
+                'mobile_no' => $request->get('mobileNo'),
+            ]);
+
+            return response()->json(["OK"],200);
+        }
+
+        // if email field is modified
+        if ($info === 'email') {
+            // Validating Email
+            $request->validate([
+                'email' => [
+                    'required',
+                    Rule::unique('users')->ignore($user->id),
+                ],
+            ]);
+
+            // updating the database
+            $user->update([
+                'email' => $request->get('email'),
+            ]);
+
+            return response()->json(["OK"],200);
+        }
+        return abort(422);
+    }
+
+    // update account Settings
+    public function updateAccountSettings(Request $request, $info)
+    {
+        $user = User::find($request->user()->id);
+        if ($info === 'language') {
+            $user->update([
+                'language' => $request->get('language'),
+            ]);
+            return response()->json(["OK"],200);
+        }
+        if ($info === 'close') {
+            try {
+                $user->delete();
+                return response()->json(["OK"],200);
+            } catch (\Exception $e) {
+                return response()->json(["Something Went Wrong"],500);
+            }
+        }
+        if ($info === 'password') {
+            $request->validate([
+                'currentPassword' => 'required|string|min:8',
+                'newPassword' => 'required|string|min:8',
+                'password_confirmation' => 'required|confirmed'
+            ]);
+
+            if (Hash::check($request->get('currentPassword'), $user->password)) {
+                $user->update([
+                    'password' => Hash::make($request->get('newPassword'))
+                ]);
+
+                return response()->json(["Ok"], 200);
+            }
+        }
+
+        return abort(422);
     }
 }

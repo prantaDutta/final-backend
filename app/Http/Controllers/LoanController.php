@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\LoanResource;
 use App\Models\Loan;
 use App\Models\User;
+use http\Env\Response;
 use Illuminate\Http\Request;
 
 class LoanController extends Controller
@@ -38,11 +39,18 @@ class LoanController extends Controller
     }
 
     // get all Loans
-    public function getAllLoans(Request $request)
+    public function getLoans(Request $request, $loanType)
     {
-        $id = $request->get('id');
+        $user = User::find($request->user()->id);
+        if ($loanType === 'all') {
+            return response()->json([
+                'loans' => LoanResource::collection($user->loans)
+            ]);
+        }
 
-        $user = User::find($id);
-        return LoanResource::collection($user->loans);
+        $loans = $user->loans->where('loan_mode',$loanType);
+        return response()->json([
+            'loans' => LoanResource::collection($loans)
+        ]);
     }
 }
