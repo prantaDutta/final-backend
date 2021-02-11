@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class VerificationResource extends JsonResource
@@ -9,14 +10,19 @@ class VerificationResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @return array
      */
     public function toArray($request)
     {
 //        return parent::toArray($request);
-        $date=date_create($this->date_of_birth);
-        $date_of_birth = date_format($date,"d-F-Y");
+        $date_of_birth = null;
+        if (!empty($this->date_of_birth) && $this->date_of_birth) {
+            $date = date_create();
+            $date_of_birth = date_format($date, "d-F-Y");
+        }
+
+
         return [
             'dateOfBirth' => $date_of_birth,
             'gender' => $this->gender,

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Resources\UserResource;
+use App\Http\Resources\VerificationResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -8,9 +10,14 @@ use Illuminate\Support\Facades\Route;
 // Authenticated Routes
 Route::group(['middleware' => ['auth:sanctum']], static function () {
 
-    // get current user
+    // get current admin
     Route::get('/', static function (Request $request) {
-        return $request->user();
+        return response()->json([
+            'user' => new UserResource($request->user()),
+            'verification' => $request->user()->verification
+                ? new VerificationResource($request->user()->verification)
+                : null
+        ]);
     });
 
     // get all verification requests
