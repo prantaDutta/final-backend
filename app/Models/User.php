@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -46,14 +47,13 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @method static Builder|User whereVerified($value)
  * @mixin Eloquent
  * @property-read Verification|null $verification
- * @property-read Collection|\App\Models\Loan[] $loans
+ * @property-read Collection|Loan[] $loans
  * @property-read int|null $loans_count
- * @property-read Collection|\App\Models\Transaction[] $transactions
+ * @property-read Collection|Transaction[] $transactions
  * @property-read int|null $transactions_count
  * @property float|null $balance
  * @method static Builder|User whereBalance($value)
  */
-
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;

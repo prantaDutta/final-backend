@@ -11,8 +11,9 @@ use Illuminate\Http\Request;
 class TransactionController extends Controller
 {
     // get all deposits
-    public function getAllDeposits($id)
+    public function getAllDeposits(Request $request)
     {
+        $id = $request->user()->id;
         $user = User::find($id);
         $deposits = $user->transactions()
             ->where('user_id', $id)
@@ -29,8 +30,9 @@ class TransactionController extends Controller
     }
 
     // get all withdrawals
-    public function getAllWithdrawals($id)
+    public function getAllWithdrawals(Request $request)
     {
+        $id = $request->user()->id;
         $user = User::find($id);
         $withdrawals = $user->transactions()
             ->where('user_id', $id)

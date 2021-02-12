@@ -41,10 +41,10 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     Route::get('/deposit', [SslCommerzPaymentController::class, 'exampleEasyCheckout']);
 
     // Get All Deposit Transactions
-    Route::get('/get-all-deposits/{id}', [TransactionController::class, 'getAllDeposits']);
+    Route::get('/get-all-deposits', [TransactionController::class, 'getAllDeposits']);
 
     // Get All Withdrawal Transactions
-    Route::get('/get-all-withdrawals/{id}', [TransactionController::class, 'getAllWithdrawals']);
+    Route::get('/get-all-withdrawals', [TransactionController::class, 'getAllWithdrawals']);
 
     // Withdraw
     Route::post('/withdraw', [TransactionController::class, 'withdraw']);
@@ -56,8 +56,17 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     Route::get('/dashboard-data', [UserController::class, 'dashboardData']);
 
     // Personal User Settings , info should be address, email or mobile no
-    Route::post('/personal/{info}',[UserController::class, 'updatePersonalSettings']);
+    Route::post('/personal/{info}', [UserController::class, 'updatePersonalSettings']);
 
     // Account User Settings , info should be language or close-account
-    Route::post('/account/{info}',[UserController::class, 'updateAccountSettings']);
+    Route::post('/account/{info}', [UserController::class, 'updateAccountSettings']);
+
+    // Get Dashboard Notifications
+    Route::get('/dashboard-notifications', [UserController::class, 'getNotifications']);
+
+    // Get All Notifications
+    Route::get('/get-all-notifications', [UserController::class, 'getAllNotifications']);
+
+    // Delete a Notification
+    Route::post('/notification/{id}', [UserController::class, 'deleteNotification']);
 });

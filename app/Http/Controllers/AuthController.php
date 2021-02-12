@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Notifications\WelcomeMessage;
 use Cookie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +25,7 @@ class AuthController extends Controller
             ],
         ]);
 
-        User::create([
+        $user = User::create([
             'email' => $request->email,
             'name' => $request->name,
             'role' => $request->role,
@@ -38,6 +39,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
+            $user->notify(new WelcomeMessage());
             return new UserResource($request->user());
         }
 

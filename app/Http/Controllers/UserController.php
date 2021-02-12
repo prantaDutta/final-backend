@@ -3,14 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\LoanResource;
+use App\Http\Resources\NotificationResource;
 use App\Http\Resources\TransactionResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\VerificationResource;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Redirect;
-use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -108,7 +110,7 @@ class UserController extends Controller
                 'zip_code' => $request->get('zipCode')
             ]);
 
-            return response()->json(["OK"],200);
+            return response()->json(["OK"], 200);
         }
 
         // if mobile field is modified
@@ -123,7 +125,7 @@ class UserController extends Controller
                 'mobile_no' => $request->get('mobileNo'),
             ]);
 
-            return response()->json(["OK"],200);
+            return response()->json(["OK"], 200);
         }
 
         // if email field is modified
@@ -141,7 +143,7 @@ class UserController extends Controller
                 'email' => $request->get('email'),
             ]);
 
-            return response()->json(["OK"],200);
+            return response()->json(["OK"], 200);
         }
         return abort(422);
     }
@@ -154,14 +156,14 @@ class UserController extends Controller
             $user->update([
                 'language' => $request->get('language'),
             ]);
-            return response()->json(["OK"],200);
+            return response()->json(["OK"], 200);
         }
         if ($info === 'close') {
             try {
                 $user->delete();
-                return response()->json(["OK"],200);
-            } catch (\Exception $e) {
-                return response()->json(["Something Went Wrong"],500);
+                return response()->json(["OK"], 200);
+            } catch (Exception $e) {
+                return response()->json(["Something Went Wrong"], 500);
             }
         }
         if ($info === 'password') {
@@ -181,5 +183,36 @@ class UserController extends Controller
         }
 
         return abort(422);
+    }
+
+    // Get dashboard Notifications
+    public function getNotifications(Request $request)
+    {
+        $user = User::find($request->user()->id);
+        $notifications = $user->notifications()
+            ->orderBy('read_at')
+            ->skip(0)->take(3)->get();
+        return response()->json([
+            'notifications' => NotificationResource::collection($notifications),
+            'count' => $user->unreadNotifications()->count()
+        ]);
+    }
+
+    // Get All Notifications
+    public function getAllNotifications(Request $request)
+    {
+        $user = User::find($request->user()->id);
+        $notifications = $user->notifications()
+            ->orderBy('read_at')
+            ->get();
+        return response()->json([
+            'notifications' => NotificationResource::collection($notifications),
+        ]);
+    }
+
+    // Delete Notification
+    public function deleteNotification(Request $request, $id)
+    {
+        return $request->user()->notifications()->where('id', $id)->delete();
     }
 }

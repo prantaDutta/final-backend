@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 
 /**
@@ -48,12 +49,14 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Loan whereMonthlyInstallmentWithCompanyFees($value)
  * @property string $loan_amount
  * @method static Builder|Loan whereLoanAmount($value)
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read int|null $notifications_count
  */
 
 class Loan extends Model
 {
     protected $guarded = [];
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     # User and Loan have a many to many relation
     public function users()

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 
 /**
@@ -41,10 +42,12 @@ use Illuminate\Support\Carbon;
  * @property string|null $transaction_type
  * @method static \Illuminate\Database\Eloquent\Builder|Transaction whereTransactionType($value)
  * @property-read TransactionDetail|null $transaction_detail
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read int|null $notifications_count
  */
 class Transaction extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     protected $fillable = ['name','email','amount','phone','address','status','transaction_id','currency', 'transaction_type'];
 

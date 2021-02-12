@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * App\Models\TransactionDetail
@@ -39,10 +40,12 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin \Eloquent
  * @property int $transaction_id
  * @method static \Illuminate\Database\Eloquent\Builder|TransactionDetail whereTransactionId($value)
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read int|null $notifications_count
  */
 class TransactionDetail extends Model
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     protected $fillable = ['card_type','card_no','bank_tran_id','error','card_issuer','card_brand','risk_level','risk_title'];
 
