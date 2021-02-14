@@ -53,6 +53,9 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property-read int|null $transactions_count
  * @property float|null $balance
  * @method static Builder|User whereBalance($value)
+ * @property string $language
+ * @method static Builder|User whereLanguage($value)
+ * @property-read \App\Models\Util|null $util
  */
 class User extends Authenticatable
 {
@@ -106,5 +109,11 @@ class User extends Authenticatable
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    # User and Util have a one to one relation
+    public function util()
+    {
+        return $this->hasOne(Util::class);
     }
 }

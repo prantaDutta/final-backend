@@ -23,6 +23,7 @@ class CreateVerificationsTable extends Migration
             $table->enum('gender',['male','female']);
             $table->string('address');
             $table->bigInteger('mobile_no');
+//            $table->timestamp('mobile_no_verified_at')->nullable();
 //            $table->enum('document_type',['nid','passport']);
             $table->enum('borrower_type',['salaried','self'])->nullable();
             $table->string('division');

@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\VerificationResource;
+use App\Notifications\VerifyEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,11 +23,17 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
         ]);
     });
 
+    // is contact-verified
+    Route::get('/contact-verified', [UserController::class, 'isContactVerified']);
+
     // Checking Unique Email Excluding Id
     Route::post('/unique-email-excluding-id', [UserController::class, 'uniqueEmailExcludingId']);
 
     // getting the user with verification
     Route::get('/user-with-verification', [UserController::class, 'userWithVerificationData']);
+
+    // Verify Email OTP
+    Route::post('/verify-email-otp', [UserController::class, 'verifyEmailOtp']);
 
     // verify an user
     Route::post('/verify', [VerificationController::class, 'verifyUser']);

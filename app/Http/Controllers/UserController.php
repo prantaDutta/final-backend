@@ -8,6 +8,10 @@ use App\Http\Resources\TransactionResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\VerificationResource;
 use App\Models\User;
+use App\Models\Util;
+use App\Notifications\EmailVerified;
+use App\Notifications\VerifyEmail;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -26,11 +30,70 @@ class UserController extends Controller
     // checks for unique Email
     public function uniqueEmail(Request $request)
     {
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->get('email'))->first();
         if (!$user) {
             return abort(422);
         }
         return response('OK', 200);
+    }
+
+    // Sending Email
+//    public function sendEmail(Request $request)
+//    {
+//
+//        $actions = new EmailActionButton('Verify', '/api/user/verify-email');
+//        $utility = new UtilController();
+//        $utility->sendAnEmail(
+//            $request->get('email'),
+//            "Verify Your Email",
+//            "Please Click the button to verify your email",
+//            "Verify Email",
+//            $actions
+//        );
+//
+//        return response()->json(["OK"], 200);
+//    }
+
+    // Sending Email
+    public function sendEmail(Request $request)
+    {
+        return $request->user()->notify(new VerifyEmail());
+    }
+
+    // Verifying the email
+    public function verifyEmail($token)
+    {
+        $util = Util::where('email_verify_token', $token)->first();
+        if ($util && ($util->created_at->diffInMinutes() <= 15)) {
+            $user = User::find($util->user_id);
+            $user->notify(new EmailVerified());
+            $url = config('app.frontEndUrl');
+            return Redirect::to($url);
+        }
+        return abort(404);
+    }
+
+    //verify email with otp
+    public function verifyEmailOtp(Request $request)
+    {
+        $otp = $request->get('otp');
+        $util = Util::where('email_verify_otp', $otp)->first();
+        if ($util && ($util->created_at->diffInMinutes() <= 15)) {
+            $user = User::find($util->user_id);
+            $user->notify(new EmailVerified());
+            return response()->json(["Ok"], 200);
+        }
+        return abort(404);
+    }
+
+    // Is Contact Verified
+    public function isContactVerified(Request $request)
+    {
+        $user = $request->user();
+        return response()->json([
+            'email' => $user->util->email_verified,
+            'mobileNo' => $user->util->mobile_no_verified
+        ], 200);
     }
 
     // checks for unique Email excluding id

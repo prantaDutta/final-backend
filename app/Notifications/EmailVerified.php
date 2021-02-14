@@ -2,11 +2,13 @@
 
 namespace App\Notifications;
 
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WelcomeMessage extends Notification
+class EmailVerified extends Notification
 {
     use Queueable;
 
@@ -39,32 +41,24 @@ class WelcomeMessage extends Notification
      */
     public function toMail($notifiable)
     {
-        if ($notifiable->role === "lender") {
-            $optionalMsg = 'Lend and Earn Now';
-        } else {
-            $optionalMsg = 'Borrow Money Today';
-        }
         return (new MailMessage)
-            ->subject('Welcome to Grayscale. ' . $optionalMsg)
+            ->subject('Email Verified')
             ->greeting('Hello Mr. ' . $notifiable->name)
-            ->line('GrayScale is one of the fastest growing peer to peer (P2P) lending
-            platforms in Bangladesh. It connects investors or lenders looking
-            for high returns with creditworthy borrowers looking for short term
-            personal loans.')
-            ->action('Let\'s Start', url(config('app.frontEndUrl')))
-            ->line('Verify Your Account and Start Today');
+            ->line('Your Email ' . $notifiable->email . ' is successfully verified')
+            ->line('Thank You For Your Co-operation')
+            ->action('Go to Homepage', url('/'));
     }
 
     # Saving data to the database
     public function toDatabase($notifiable)
     {
-        if ($notifiable->role === "lender") {
-            $optionalMsg = 'Lend and Earn Now';
-        } else {
-            $optionalMsg = 'Borrow Money Today';
-        }
+        $user = User::where('email', $notifiable->email)->first();
+        $user->util()->update([
+            'email_verified_at' => Carbon::now(),
+            'email_verified' => true
+        ]);
         return [
-            'msg' => 'Welcome to Grayscale. ' . $optionalMsg
+            'msg' => 'Your Email is Successfully Verified'
         ];
     }
 

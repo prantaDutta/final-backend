@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Notifications\VerifyEmail;
 use App\Notifications\WelcomeMessage;
-use Cookie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +14,8 @@ use Illuminate\Validation\Rule;
 class AuthController extends Controller
 {
     // register the user
-    public function register(Request $request){
+    public function register(Request $request)
+    {
         $request->validate([
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
@@ -34,12 +35,18 @@ class AuthController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
+        $user->util()->create([
+            'email_verified' => false,
+            'mobile_no_verified' => false
+        ]);
+
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
             $user->notify(new WelcomeMessage());
+            $user->notify(new VerifyEmail());
             return new UserResource($request->user());
         }
 
@@ -49,7 +56,8 @@ class AuthController extends Controller
     }
 
     // logging the user
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
 //        dd($request);
         $request->validate([
             'email' => 'required|email',

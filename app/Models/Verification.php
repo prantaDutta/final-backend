@@ -47,6 +47,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Verification whereDivision($value)
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
+ * @property string|null $mobile_no_verified_at
+ * @method static Builder|Verification whereMobileNoVerifiedAt($value)
  */
 class Verification extends Model
 {
