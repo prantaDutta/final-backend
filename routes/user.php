@@ -7,7 +7,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\VerificationResource;
-use App\Notifications\VerifyEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,7 +18,9 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     Route::get('/', static function (Request $request) {
         return response()->json([
             'user' => new UserResource($request->user()),
-            'verification' => new VerificationResource($request->user()->verification)
+            'verification' => $request->user()->verification()->exists()
+                ? new VerificationResource($request->user()->verification)
+                : null
         ]);
     });
 

@@ -10,7 +10,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -55,17 +54,17 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @method static Builder|User whereBalance($value)
  * @property string $language
  * @method static Builder|User whereLanguage($value)
- * @property-read \App\Models\Util|null $util
+ * @property-read Util|null $util
  */
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+//    /**
+//     * The attributes that are mass assignable.
+//     *
+//     * @var array
+//     */
 //    protected $fillable = [
 //        'name',
 //        'email',
@@ -84,14 +83,14 @@ class User extends Authenticatable
 
     protected $guarded = [];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+//    /**
+//     * The attributes that should be cast to native types.
+//     *
+//     * @var array
+//     */
+//    protected $casts = [
+//        'email_verified_at' => 'datetime',
+//    ];
 
     # User and Verification have a one to one relation
     public function verification()
