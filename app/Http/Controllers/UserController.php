@@ -10,12 +10,14 @@ use App\Http\Resources\VerificationResource;
 use App\Models\User;
 use App\Models\Util;
 use App\Notifications\EmailVerified;
+use App\Notifications\MobileNoVerified;
+use App\Notifications\SendVerifyMobileSMS;
 use App\Notifications\VerifyEmail;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Notification;
 use Redirect;
 
 class UserController extends Controller
@@ -54,17 +56,35 @@ class UserController extends Controller
 //        return response()->json(["OK"], 200);
 //    }
 
+    // get current user's mobile no
+    public function getMobileNo(Request $request) {
+        return $request->user()->verification->mobile_no;
+    }
+
     // Sending Email
-    public function sendEmail(Request $request)
+    public function sendVerifyEmail(Request $request)
     {
-        return $request->user()->notify(new VerifyEmail());
+        $email = $request->get('email');
+        $user = $request->user();
+        $uniq_id = uniqid('', true);
+        $otp = mt_rand(100000, 999999);
+        $user->util()->update([
+            'email_verify_token' => $uniq_id,
+            'email_verify_otp' => $otp
+        ]);
+        Notification::route('mail', [$email => $user->name])
+            ->notify(new VerifyEmail($user->name, $email, $otp, $uniq_id));
+        return response()->json(["OK"], 200);
     }
 
     // Verifying the email
-    public function verifyEmail($token)
+    public function verifyEmail($email, $token)
     {
         $util = Util::where('email_verify_token', $token)->first();
-        if ($util && ($util->created_at->diffInMinutes() <= 15)) {
+        $user = User::find($util->user_id);
+        $user->email = $email;
+        $user->save();
+        if ($util && ($util->updated_at->diffInMinutes() <= 15)) {
             $user = User::find($util->user_id);
             $user->notify(new EmailVerified());
             $url = config('app.frontEndUrl');
@@ -77,10 +97,54 @@ class UserController extends Controller
     public function verifyEmailOtp(Request $request)
     {
         $otp = $request->get('otp');
+        $email = $request->get('email');
         $util = Util::where('email_verify_otp', $otp)->first();
-        if ($util && ($util->created_at->diffInMinutes() <= 15)) {
+        $user = User::find($util->user_id);
+        $user->email = $email;
+        $user->save();
+//        if ($util && ($util->updated_at->diffInMinutes() <= 15)) {
+        if ($util) {
             $user = User::find($util->user_id);
             $user->notify(new EmailVerified());
+            return response()->json(["Ok"], 200);
+        }
+        return abort(404);
+    }
+
+    // Sending OTP to mobile no
+    public function sendMobileOTP(Request $request)
+    {
+        $mobile_no = $request->get('mobileNo');
+        $otp = mt_rand(100000, 999999);
+        $user = $request->user();
+        $user->util()->update([
+            'mobile_no_verify_otp' => $otp
+        ]);
+
+        try {
+            // uncomment this lines to send messages
+//            $util = new UtilController();
+//            $util->sendSMS('880' . $mobile_no, 'Your OTP is ' . $otp);
+            $user->notify(new SendVerifyMobileSMS());
+            return response()->json(["OK"], 200);
+        } catch (Exception $e) {
+            return $e;
+        }
+    }
+
+    // Verifying Mobile No
+    public function verifyMobileNo(Request $request)
+    {
+        $otp = $request->get('otp');
+        $mobile_no = $request->get('mobileNo');
+        $util = Util::where('mobile_no_verify_otp', $otp)->first();
+        $user = User::find($util->user_id);
+        $user->verification()->update([
+            'mobile_no' => $mobile_no
+        ]);
+        if ($util && ($util->updated_at->diffInMinutes() <= 15)) {
+            $user = User::find($util->user_id);
+            $user->notify(new MobileNoVerified());
             return response()->json(["Ok"], 200);
         }
         return abort(404);
@@ -100,7 +164,7 @@ class UserController extends Controller
     public function uniqueEmailExcludingId(Request $request)
     {
         $user = User::where('email', $request->get('email'))->first();
-        if (!$user || $user->id !== $request->get('id')) {
+        if ($user && $user->id !== $request->get('id')) {
             return response('ERROR', 422);
         }
         return response('OK', 200);
@@ -180,7 +244,7 @@ class UserController extends Controller
         if ($info === 'mobile') {
             // Validating Mobile No
             $request->validate([
-                'mobileNo' => 'required|numeric|digits:13',
+                'mobileNo' => 'required|numeric|digits:10',
             ]);
 
             // updating the database
@@ -253,7 +317,7 @@ class UserController extends Controller
     {
         $user = User::find($request->user()->id);
         $notifications = $user->notifications()
-            ->orderBy('read_at')
+            ->orderBy('updated_at')
             ->skip(0)->take(3)->get();
         return response()->json([
             'notifications' => NotificationResource::collection($notifications),

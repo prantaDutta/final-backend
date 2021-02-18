@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Nexmo\Client;
+use Nexmo\Client\Credentials\Basic;
 
 class UtilController extends Controller
 {
@@ -19,10 +20,24 @@ class UtilController extends Controller
             'message' => $message,
             'action' => $action,
         ];
-        Mail::send('mail', array('data' => $data), function($message) use($email, $subject){
+        Mail::send('mail', array('data' => $data), function ($message) use ($email, $subject) {
             $message->to($email, 'Grayscale')->subject
             ($subject);
         });
         return response()->json(["OK"], 200);
+    }
+
+    // Send an SMS
+    public function sendSMS($mobile_no, $msg)
+    {
+        $basic = new Basic(config('nexmo.api_key'), config('nexmo.api_secret'));
+        $client = new Client($basic);
+
+        // As Nexmo doesn't allow other numbers
+        return $client->message()->send([
+            'to' => '8801779266259',
+            'from' => 'Grayscale',
+            'text' => 'Grayscale: ' . $msg
+        ]);
     }
 }

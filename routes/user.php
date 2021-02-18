@@ -27,6 +27,9 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     // is contact-verified
     Route::get('/contact-verified', [UserController::class, 'isContactVerified']);
 
+    // getting the mobile no..i am an idiot, that's why i am doing this
+    Route::get('/get-mobile-no', [UserController::class, 'getMobileNo']);
+
     // Checking Unique Email Excluding Id
     Route::post('/unique-email-excluding-id', [UserController::class, 'uniqueEmailExcludingId']);
 
@@ -35,6 +38,12 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
 
     // Verify Email OTP
     Route::post('/verify-email-otp', [UserController::class, 'verifyEmailOtp']);
+
+    // Sending OTP to mobile no
+    Route::post('/send-mobile-otp', [UserController::class, 'sendMobileOTP']);
+
+    // Verify Mobile OTP
+    Route::post('/verify-mobile-no', [UserController::class, 'verifyMobileNo']);
 
     // verify an user
     Route::post('/verify', [VerificationController::class, 'verifyUser']);
@@ -63,12 +72,6 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     // Fetching Alternate Dashboard Data
     Route::get('/dashboard-data', [UserController::class, 'dashboardData']);
 
-    // Personal User Settings , info should be address, email or mobile no
-    Route::post('/personal/{info}', [UserController::class, 'updatePersonalSettings']);
-
-    // Account User Settings , info should be language or close-account
-    Route::post('/account/{info}', [UserController::class, 'updateAccountSettings']);
-
     // Get Dashboard Notifications
     Route::get('/dashboard-notifications', [UserController::class, 'getNotifications']);
 
@@ -77,4 +80,10 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
 
     // Delete a Notification
     Route::post('/notification/{id}', [UserController::class, 'deleteNotification']);
+
+    // Personal User Settings , info should be address, email or mobile no
+    Route::post('/personal/{info}', [UserController::class, 'updatePersonalSettings']);
+
+    // Account User Settings , info should be language or close-account
+    Route::post('/account/{info}', [UserController::class, 'updateAccountSettings']);
 });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\LoanResource;
 use App\Models\Loan;
 use App\Models\User;
+use App\Notifications\NewLoanRequested;
 use http\Env\Response;
 use Illuminate\Http\Request;
 
@@ -17,6 +18,12 @@ class LoanController extends Controller
 
         # find the user first
         $user = User::find($id);
+
+        if ($user->loans_count <= 2) {
+            return response()->json([
+                'error' => 'You Already have two ongoing loans'
+            ], 422);
+        }
 
         # add the loan data to the user relation
         $amount = $values['amount'];
@@ -35,6 +42,7 @@ class LoanController extends Controller
             'monthly_installment_with_company_fees' => $values['modifiedMonthlyInstallment']
         ]);
 
+        $user->notify(new NewLoanRequested());
         return response('OK', 200);
     }
 

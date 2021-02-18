@@ -14,8 +14,8 @@ Route::group(['middleware' => ['web']], static function () {
     Route::post('/unique-email', [UserController::class, 'uniqueEmail']);
 
     // Sending an Email
-    Route::post('/send-email', [UserController::class, 'sendEmail']);
+    Route::post('/send-verify-email', [UserController::class, 'sendVerifyEmail']);
 
     // Verify Email
-    Route::get('/verify-email/{token}', [UserController::class, 'verifyEmail']);
+    Route::get('/verify-email/{email}/{token}', [UserController::class, 'verifyEmail']);
 });

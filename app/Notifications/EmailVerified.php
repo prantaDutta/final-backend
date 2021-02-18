@@ -43,7 +43,7 @@ class EmailVerified extends Notification
     {
         return (new MailMessage)
             ->subject('Email Verified')
-            ->greeting('Hello Mr. ' . $notifiable->name)
+            ->greeting('Hello ' . $notifiable->name)
             ->line('Your Email ' . $notifiable->email . ' is successfully verified')
             ->line('Thank You For Your Co-operation')
             ->action('Go to Homepage', url('/'));

@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -114,5 +115,15 @@ class User extends Authenticatable
     public function util()
     {
         return $this->hasOne(Util::class);
+    }
+
+    // This one is for sending alternative email to user
+    public function routeNotificationForMail()
+    {
+        if (request()->has('email_override') && request()->has('email')) {
+            return request()->input('email');
+        }
+
+        return $this->email;
     }
 }

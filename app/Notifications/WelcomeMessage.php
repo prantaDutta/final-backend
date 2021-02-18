@@ -46,7 +46,7 @@ class WelcomeMessage extends Notification
         }
         return (new MailMessage)
             ->subject('Welcome to Grayscale. ' . $optionalMsg)
-            ->greeting('Hello Mr. ' . $notifiable->name)
+            ->greeting('Hello ' . $notifiable->name)
             ->line('GrayScale is one of the fastest growing peer to peer (P2P) lending
             platforms in Bangladesh. It connects investors or lenders looking
             for high returns with creditworthy borrowers looking for short term

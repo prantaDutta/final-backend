@@ -43,6 +43,8 @@ use Illuminate\Support\Carbon;
  * @property-read int|null $notifications_count
  * @method static Builder|Util whereEmailVerifyOtp($value)
  * @method static Builder|Util whereMobileNoVerifyOtp($value)
+ * @property string|null $temp_email
+ * @method static Builder|Util whereTempEmail($value)
  */
 class Util extends Model
 {
