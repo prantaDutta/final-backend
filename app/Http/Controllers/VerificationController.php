@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Models\Verification;
 use Carbon\Carbon;
@@ -16,7 +17,6 @@ class VerificationController extends Controller
         // saving user data
         $user = User::where('email', $values['email'])->first();
         $user->name = $values['name'];
-        $user->email = $values['email'];
         $user->verified = 'pending';
         $user->save();
         // saving verification Data
@@ -26,7 +26,6 @@ class VerificationController extends Controller
         $verification->borrower_type = $user->role === 'lender' ? null : $values['borrowerType'];
         $verification->date_of_birth = Carbon::parse($values['dateOfBirth'])->format('Y-m-d');
         $verification->gender = $values['gender'];
-        $verification->mobile_no = $values['mobileNo'];
         $verification->zila = $values['zila'];
         $verification->division = $values['division'];
         $verification->zip_code = $values['zip_code'];
@@ -34,6 +33,6 @@ class VerificationController extends Controller
 
         $user->verification()->save($verification);
 
-        return response('OK', 200);
+        return new UserResource($user);
     }
 }

@@ -10,15 +10,21 @@ class UserResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  Request  $request
+     * @param Request $request
      * @return array
      */
     public function toArray($request)
     {
+        $mobileNoVerifiedAt = false;
+        if ($this->mobile_no_verified_at !== null) {
+            $mobileNoVerifiedAt = true;
+        }
         return [
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'mobileNo' => substr((string)$this->mobile_no, 3),
+            'mobileNoVerified' => $mobileNoVerifiedAt,
             'role' => $this->role,
             'balance' => $this->balance,
             'verified' => $this->verified,

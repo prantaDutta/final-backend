@@ -27,9 +27,6 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     // is contact-verified
     Route::get('/contact-verified', [UserController::class, 'isContactVerified']);
 
-    // getting the mobile no..i am an idiot, that's why i am doing this
-    Route::get('/get-mobile-no', [UserController::class, 'getMobileNo']);
-
     // Checking Unique Email Excluding Id
     Route::post('/unique-email-excluding-id', [UserController::class, 'uniqueEmailExcludingId']);
 

@@ -11,8 +11,9 @@ use App\Models\User;
 use App\Models\Util;
 use App\Notifications\EmailVerified;
 use App\Notifications\MobileNoVerified;
-use App\Notifications\SendVerifyMobileSMS;
+use App\Notifications\SendMobileOTP;
 use App\Notifications\VerifyEmail;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -57,7 +58,8 @@ class UserController extends Controller
 //    }
 
     // get current user's mobile no
-    public function getMobileNo(Request $request) {
+    public function getMobileNo(Request $request)
+    {
         return $request->user()->verification->mobile_no;
     }
 
@@ -105,6 +107,8 @@ class UserController extends Controller
 //        if ($util && ($util->updated_at->diffInMinutes() <= 15)) {
         if ($util) {
             $user = User::find($util->user_id);
+            $user->email_verified_at = Carbon::now();
+            $user->save();
             $user->notify(new EmailVerified());
             return response()->json(["Ok"], 200);
         }
@@ -115,17 +119,16 @@ class UserController extends Controller
     public function sendMobileOTP(Request $request)
     {
         $mobile_no = $request->get('mobileNo');
-        $otp = mt_rand(100000, 999999);
         $user = $request->user();
-        $user->util()->update([
-            'mobile_no_verify_otp' => $otp
-        ]);
+
+        $user->mobile_no = 880 . $mobile_no;
+        $user->save();
 
         try {
             // uncomment this lines to send messages
 //            $util = new UtilController();
 //            $util->sendSMS('880' . $mobile_no, 'Your OTP is ' . $otp);
-            $user->notify(new SendVerifyMobileSMS());
+            $user->notify(new SendMobileOTP());
             return response()->json(["OK"], 200);
         } catch (Exception $e) {
             return $e;
@@ -136,14 +139,11 @@ class UserController extends Controller
     public function verifyMobileNo(Request $request)
     {
         $otp = $request->get('otp');
-        $mobile_no = $request->get('mobileNo');
         $util = Util::where('mobile_no_verify_otp', $otp)->first();
         $user = User::find($util->user_id);
-        $user->verification()->update([
-            'mobile_no' => $mobile_no
-        ]);
+        $user->mobile_no_verified_at = Carbon::now();
+        $user->save();
         if ($util && ($util->updated_at->diffInMinutes() <= 15)) {
-            $user = User::find($util->user_id);
             $user->notify(new MobileNoVerified());
             return response()->json(["Ok"], 200);
         }
@@ -154,9 +154,17 @@ class UserController extends Controller
     public function isContactVerified(Request $request)
     {
         $user = $request->user();
+        $email_verified = false;
+        if ($user->email_verified_at !== null) {
+            $email_verified = true;
+        }
+        $mobile_no_verified = false;
+        if ($user->mobile_no_verified_at !== null) {
+            $mobile_no_verified = true;
+        }
         return response()->json([
-            'email' => $user->util->email_verified,
-            'mobileNo' => $user->util->mobile_no_verified
+            'email' => $email_verified,
+            'mobileNo' => $mobile_no_verified,
         ], 200);
     }
 

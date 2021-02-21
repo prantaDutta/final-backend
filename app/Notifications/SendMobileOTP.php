@@ -4,12 +4,13 @@ namespace App\Notifications;
 
 use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Messages\NexmoMessage;
 use Illuminate\Notifications\Notification;
 
-class SendVerifyMobileSMS extends Notification
+class SendMobileOTP extends Notification
 {
     use Queueable;
+    protected $otp;
 
     /**
      * Create a new notification instance.
@@ -18,7 +19,7 @@ class SendVerifyMobileSMS extends Notification
      */
     public function __construct()
     {
-        //
+        $this->otp = mt_rand(100000, 999999);
     }
 
     /**
@@ -29,22 +30,8 @@ class SendVerifyMobileSMS extends Notification
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['database', 'nexmo'];
     }
-
-//    /**
-//     * Get the mail representation of the notification.
-//     *
-//     * @param mixed $notifiable
-//     * @return MailMessage
-//     */
-//    public function toMail($notifiable)
-//    {
-//        return (new MailMessage)
-//            ->line('The introduction to the notification.')
-//            ->action('Notification Action', url('/'))
-//            ->line('Thank you for using our application!');
-//    }
 
     /**
      * Saving Data to the Database
@@ -54,9 +41,29 @@ class SendVerifyMobileSMS extends Notification
      */
     public function toDatabase($notifiable)
     {
+        $user = User::where('email', $notifiable->email)->first();
+        $user->util()->update([
+            'mobile_no_verify_otp' => $this->otp
+        ]);
         return [
             'msg' => 'You Will receive an OTP in a minute'
         ];
+    }
+
+    /**
+     * Get the Vonage / SMS representation of the notification.
+     *
+     * @param mixed $notifiable
+//     * @return NexmoMessage
+     * @return array
+     */
+    public function toNexmo($notifiable)
+    {
+        // Uncomment this line to send message
+//        return (new NexmoMessage)
+//            ->content('Your Grayscale OTP is '.$this->otp)
+//            ->from('Grayscale');
+        return [];
     }
 
     /**

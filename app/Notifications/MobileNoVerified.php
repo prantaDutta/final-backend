@@ -52,11 +52,6 @@ class MobileNoVerified extends Notification
     # Saving data to the database
     public function toDatabase($notifiable)
     {
-        $user = User::where('email', $notifiable->email)->first();
-        $user->util()->update([
-            'mobile_no_verified_at' => Carbon::now(),
-            'mobile_no_verified' => true
-        ]);
         return [
             'msg' => 'Your Mobile No is Successfully Verified'
         ];

@@ -27,7 +27,6 @@ class VerificationResource extends JsonResource
             'dateOfBirth' => $date_of_birth,
             'gender' => $this->gender,
             'address' => $this->address,
-            'mobileNo' => $this->mobile_no,
             'mobileNoVerified' => $this->mobile_no_verified,
             'borrowerType' => $this->borrower_type ?: "N/A",
             'division' => $this->division,

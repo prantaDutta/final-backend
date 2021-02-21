@@ -52,11 +52,6 @@ class EmailVerified extends Notification
     # Saving data to the database
     public function toDatabase($notifiable)
     {
-        $user = User::where('email', $notifiable->email)->first();
-        $user->util()->update([
-            'email_verified_at' => Carbon::now(),
-            'email_verified' => true
-        ]);
         return [
             'msg' => 'Your Email is Successfully Verified'
         ];

@@ -17,8 +17,9 @@ class CreateUsersTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->bigInteger('mobile_no');
-//            $table->timestamp('email_verified_at')->nullable();
+            $table->bigInteger('mobile_no')->nullable()->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('mobile_no_verified_at')->nullable();
             $table->enum('role', ['admin', 'lender', 'borrower']);
             $table->enum('verified', ['verified', 'unverified', 'pending'])->default('unverified');
             $table->double('balance',12,2)->nullable();

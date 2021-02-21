@@ -20,10 +20,10 @@ class CreateUtilsTable extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
 //            $table->string('temp_email')->nullable();
-            $table->boolean('email_verified')->nullable();
-            $table->boolean('mobile_no_verified')->nullable();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->timestamp('mobile_no_verified_at')->nullable();
+//            $table->boolean('email_verified')->nullable();
+//            $table->boolean('mobile_no_verified')->nullable();
+//            $table->timestamp('email_verified_at')->nullable();
+//            $table->timestamp('mobile_no_verified_at')->nullable();
             $table->string('email_verify_token')->nullable();
 //            $table->string('mobile_no_verify_token')->nullable();
             $table->string('email_verify_otp')->nullable();

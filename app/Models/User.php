@@ -56,6 +56,10 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property string $language
  * @method static Builder|User whereLanguage($value)
  * @property-read Util|null $util
+ * @property int|null $mobile_no
+ * @method static Builder|User whereMobileNo($value)
+ * @property Carbon|null $mobile_no_verified_at
+ * @method static Builder|User whereMobileNoVerifiedAt($value)
  */
 class User extends Authenticatable
 {
@@ -89,9 +93,10 @@ class User extends Authenticatable
 //     *
 //     * @var array
 //     */
-//    protected $casts = [
-//        'email_verified_at' => 'datetime',
-//    ];
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'mobile_no_verified_at' => 'datetime',
+    ];
 
     # User and Verification have a one to one relation
     public function verification()
@@ -115,6 +120,17 @@ class User extends Authenticatable
     public function util()
     {
         return $this->hasOne(Util::class);
+    }
+
+    /**
+     * Route notifications for the Nexmo channel.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return string
+     */
+    public function routeNotificationForNexmo($notification)
+    {
+        return $this->mobile_no;
     }
 
     // This one is for sending alternative email to user

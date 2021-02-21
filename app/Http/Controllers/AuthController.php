@@ -35,11 +35,6 @@ class AuthController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        $user->util()->create([
-            'email_verified' => false,
-            'mobile_no_verified' => false
-        ]);
-
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
@@ -47,7 +42,7 @@ class AuthController extends Controller
 
             $uniq_id = uniqid('', true);
             $otp = mt_rand(100000, 999999);
-            $user->util()->update([
+            $user->util()->create([
                 'email_verify_token' => $uniq_id,
                 'email_verify_otp' => $otp
             ]);
