@@ -118,12 +118,12 @@ class User extends Authenticatable
     }
 
     // This one is for sending alternative email to user
-    public function routeNotificationForMail()
-    {
-        if (request()->has('email_override') && request()->has('email')) {
-            return request()->input('email');
-        }
-
-        return $this->email;
-    }
+//    public function routeNotificationForMail()
+//    {
+//        if (request()->has('email_override') && request()->has('email')) {
+//            return request()->input('email');
+//        }
+//
+//        return $this->email;
+//    }
 }
