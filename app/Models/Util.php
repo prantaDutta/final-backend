@@ -53,7 +53,7 @@ class Util extends Model
 //    protected $fillable = ['email_verified', 'mobile_no_verified'];
     protected $guarded = [];
 
-    # verification and user has one to one relation
+    # Util and user has one to one relation
     public function user()
     {
         return $this->belongsTo(User::class);

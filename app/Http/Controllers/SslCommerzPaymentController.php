@@ -7,7 +7,6 @@ use App\Models\Transaction;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Redirect;
 
 class SslCommerzPaymentController extends Controller
 {
@@ -238,8 +237,11 @@ class SslCommerzPaymentController extends Controller
 
                 echo "<br >Transaction is successfully Completed. Redirecting, Please Wait";
                 sleep(5);
-                $url = config('app.frontEndUrl');
-                return Redirect::to($url . '/deposits');
+                # this line will close the current window
+                echo "<script>window.close();</script>";
+//            $url = config('app.frontEndUrl');
+//            return Redirect::to($url . '/deposits');
+                return;
             }
 
             /*
@@ -257,8 +259,10 @@ class SslCommerzPaymentController extends Controller
              */
             echo "Transaction is already Successful. Redirecting, Please wait.....";
             sleep(5);
-            $url = config('app.frontEndUrl');
-            return Redirect::to($url . '/deposits');
+            # this line will close the current window
+            echo "<script>window.close();</script>";
+//            $url = config('app.frontEndUrl');
+//            return Redirect::to($url . '/deposits');
         } else {
             #That means something wrong happened. You can redirect customer to your product page.
             echo "Invalid Transaction";
@@ -326,8 +330,11 @@ class SslCommerzPaymentController extends Controller
         } else if ($order_details->status === 'Completed') {
             echo "Transaction is already Successful. Redirecting, Please wait.....";
             sleep(2);
-            $url = config('app.frontEndUrl');
-            return Redirect::to($url . '/deposits');
+
+            # this line will close the current window
+            echo "<script>window.close();</script>";
+//            $url = config('app.frontEndUrl');
+//            return Redirect::to($url . '/deposits');
         } else {
             echo "Transaction is Invalid";
         }
@@ -375,8 +382,10 @@ class SslCommerzPaymentController extends Controller
         } else if ($order_details->status === 'Completed') {
             echo "Transaction is already Successful. Redirecting, Please wait.....";
             sleep(2);
-            $url = config('app.frontEndUrl');
-            return Redirect::to($url . '/deposits');
+            # this line will close the current window
+            echo "<script>window.close();</script>";
+//            $url = config('app.frontEndUrl');
+//            return Redirect::to($url . '/deposits');
         } else {
             echo "Transaction is Invalid";
         }

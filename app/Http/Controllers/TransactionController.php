@@ -17,7 +17,8 @@ class TransactionController extends Controller
         $user = User::find($id);
         $deposits = $user->transactions()
             ->where('user_id', $id)
-            ->where('transaction_type','deposit')->get();
+            ->where('transaction_type','deposit')
+            ->orderByDesc('created_at')->get();
 
         if ($deposits) {
             return response()->json([

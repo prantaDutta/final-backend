@@ -2,10 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Loan;
-use App\Models\Transaction;
-use App\Models\TransactionDetail;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -17,9 +13,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-         User::factory(100)->create();
-         Loan::factory(200)->create();
-         Transaction::factory(200)->create();
-         TransactionDetail::factory(200)->create();
+        $this->call(SpecialSeeder::class);
+//         User::factory(100)
+//             ->has(Loan::factory()->count(5))
+//             ->has(Transaction::factory()->count(5)
+//                 ->has(TransactionDetail::factory()->count(1), 'transaction_detail'))
+//             ->create();
+
     }
 }

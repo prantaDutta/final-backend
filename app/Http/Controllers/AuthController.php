@@ -39,15 +39,6 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-
-            $uniq_id = uniqid('', true);
-            $otp = mt_rand(100000, 999999);
-            $user->util()->create([
-                'email_verify_token' => $uniq_id,
-                'email_verify_otp' => $otp
-            ]);
-            $user->notify(new WelcomeMessage());
-            $user->notify(new VerifyEmail($user->name, $user->email, $otp, $uniq_id));
             return new UserResource($request->user());
         }
 

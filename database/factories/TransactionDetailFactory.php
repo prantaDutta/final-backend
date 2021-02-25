@@ -44,7 +44,7 @@ class TransactionDetailFactory extends Factory
             $card_brand = "VISA";
         }
         return [
-            'transaction_id' => mt_rand(1, 100),
+//            'transaction_id' => mt_rand(1, 100),
             'card_type' => $card_type,
             'card_no' => $card_no,
             'bank_tran_id' => uniqid('',true),

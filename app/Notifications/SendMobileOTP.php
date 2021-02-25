@@ -30,7 +30,7 @@ class SendMobileOTP extends Notification
      */
     public function via($notifiable)
     {
-        return ['database', 'nexmo'];
+        return ['database' /*, 'nexmo' */];
     }
 
     /**

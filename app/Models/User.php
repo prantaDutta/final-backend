@@ -60,6 +60,7 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @method static Builder|User whereMobileNo($value)
  * @property Carbon|null $mobile_no_verified_at
  * @method static Builder|User whereMobileNoVerifiedAt($value)
+ * @property-read \App\Models\LoanPreference|null $loan_preference
  */
 class User extends Authenticatable
 {
@@ -88,11 +89,11 @@ class User extends Authenticatable
 
     protected $guarded = [];
 
-//    /**
-//     * The attributes that should be cast to native types.
-//     *
-//     * @var array
-//     */
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'mobile_no_verified_at' => 'datetime',
@@ -122,10 +123,16 @@ class User extends Authenticatable
         return $this->hasOne(Util::class);
     }
 
+    # User and Loan Preference have a one to one relation
+    public function loan_preference()
+    {
+        return $this->hasOne(LoanPreference::class);
+    }
+
     /**
      * Route notifications for the Nexmo channel.
      *
-     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param Notification $notification
      * @return string
      */
     public function routeNotificationForNexmo($notification)

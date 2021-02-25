@@ -22,9 +22,9 @@ class CreateUsersTable extends Migration
             $table->timestamp('mobile_no_verified_at')->nullable();
             $table->enum('role', ['admin', 'lender', 'borrower']);
             $table->enum('verified', ['verified', 'unverified', 'pending'])->default('unverified');
-            $table->double('balance',12,2)->nullable();
+            $table->decimal('balance', 12)->nullable();
             $table->string('password');
-            $table->enum('language',['English','বাংলা'])->default('English');
+            $table->enum('language', ['English', 'বাংলা'])->default('English');
             $table->rememberToken();
             $table->timestamps();
         });

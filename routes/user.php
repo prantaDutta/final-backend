@@ -83,4 +83,10 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
 
     // Account User Settings , info should be language or close-account
     Route::post('/account/{info}', [UserController::class, 'updateAccountSettings']);
+
+//    // Get Loan Preference
+//    Route::get('/get-loan-preferences', [UserController::class, 'getLoanPreferences']);
+//
+    // Saving Loan Preference
+    Route::post('/save-loan-preferences', [UserController::class, 'saveLoanPreferences']);
 });

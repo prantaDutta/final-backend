@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\LoanPreferenceResource;
 use App\Http\Resources\LoanResource;
 use App\Http\Resources\NotificationResource;
 use App\Http\Resources\TransactionResource;
@@ -349,5 +350,26 @@ class UserController extends Controller
     public function deleteNotification(Request $request, $id)
     {
         return $request->user()->notifications()->where('id', $id)->delete();
+    }
+
+//    # Get Loan Preferences
+//    public function getLoanPreferences(Request $request)
+//    {
+//        $user = $request->user();
+////        return $user->loan_preference;
+//        return response()->json([
+//            'preferences' => new LoanPreferenceResource($user->loan_preference)
+//        ], 200);
+//    }
+//
+    # Saving Loan Preferences
+    public function saveLoanPreferences(Request $request)
+    {
+        $distributed_amounts = implode( ', ', $request->get('distributedArray'));
+        $user = $request->user();
+        $user->loan_preference()->update([
+            'distributed_amounts' => $distributed_amounts,
+        ]);
+        return response()->json(["OK"], 200);
     }
 }

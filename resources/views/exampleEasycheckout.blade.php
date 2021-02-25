@@ -77,6 +77,7 @@
                     <div class="col-md-12 mb-3">
                         <label for="total_amount">Amount</label>
                         <input
+                            value="{{ app('request')->input('amount') }}"
                             type="text" name="amount" id="total_amount"
                             placeholder="Enter The Amount You want to Deposit"
                             class="form-control" required/>
@@ -91,8 +92,8 @@
                         <label for="firstName">Full name</label>
                         <label for="customer_name"></label>
                         <input type="text" name="customer_name" class="form-control"
-                                                                  id="customer_name" placeholder=""
-                                                                  value="{{ $user->name ?: "" }}" required>
+                               id="customer_name" placeholder=""
+                               value="{{ $user->name ?: "" }}" required>
                         <div class="invalid-feedback">
                             Valid customer name is required.
                         </div>
@@ -106,7 +107,7 @@
                             <span class="input-group-text">+880</span>
                         </div>
                         <input type="text" name="customer_mobile" class="form-control" id="mobile" placeholder="Mobile"
-                               value="{{ $user->verification ? $user->verification->mobile_no : null }}" required>
+                               value="{{ $user ? substr((string)$user->mobile_no, 3) : null }}" required>
                         <div class="invalid-feedback" style="width: 100%;">
                             Your Mobile number is required.
                         </div>
@@ -131,10 +132,10 @@
                     </div>
                 </div>
 
-{{--                <div class="mb-3">--}}
-{{--                    <label for="address2">Address 2 <span class="text-muted">(Optional)</span></label>--}}
-{{--                    <input type="text" class="form-control" id="address2" placeholder="Apartment or suite">--}}
-{{--                </div>--}}
+                {{--                <div class="mb-3">--}}
+                {{--                    <label for="address2">Address 2 <span class="text-muted">(Optional)</span></label>--}}
+                {{--                    <input type="text" class="form-control" id="address2" placeholder="Apartment or suite">--}}
+                {{--                </div>--}}
 
                 <div class="row">
                     <div class="col-md-4 mb-3">
@@ -142,7 +143,8 @@
                         <select class="custom-select d-block w-100" id="division" required>
                             <option value="">Choose One...</option>
                             @if ($user->verification)
-                                <option selected value="{{ $user->verification->division }}">{{ ucfirst($user->verification->division) }}</option>
+                                <option selected
+                                        value="{{ $user->verification->division }}">{{ ucfirst($user->verification->division) }}</option>
                             @endif
                             @foreach(json_decode($divisions, true) as $division)
                                 @if($user->verification && ucfirst($user->verification->division) == $division['name'])
@@ -161,7 +163,8 @@
                         <select class="custom-select d-block w-100" id="zila" required>
                             <option value="">Choose One...</option>
                             @if ($user->verification)
-                                <option selected value="{{ $user->verification->zila }}">{{ ucfirst($user->verification->zila)  }}</option>
+                                <option selected
+                                        value="{{ $user->verification->zila }}">{{ ucfirst($user->verification->zila)  }}</option>
                             @endif
                             @foreach(json_decode($zilas, true) as $zila)
                                 @if($user->verification && ucfirst($user->verification->zila) === $zila['name'])
@@ -177,19 +180,21 @@
 
                     <div class="col-md-4 mb-3">
                         <label for="zip">Zip</label>
-                        <input type="text" class="form-control" value="{{$user->verification ? $user->verification->zip_code : null}}" id="zip" placeholder="e.g 4000" required>
+                        <input type="text" class="form-control"
+                               value="{{$user->verification ? $user->verification->zip_code : null}}" id="zip"
+                               placeholder="e.g 4000" required>
                         <div class="invalid-feedback">
                             Zip code required.
                         </div>
                     </div>
                 </div>
                 <hr class="mb-4">
-{{--                <div class="custom-control custom-checkbox">--}}
-{{--                    <input type="checkbox" class="custom-control-input" id="same-address">--}}
-{{--                    <input type="hidden" value="1200" name="amount" id="total_amount" required/>--}}
-{{--                    <label class="custom-control-label" for="same-address">Shipping address is the same as my billing--}}
-{{--                        address</label>--}}
-{{--                </div>--}}
+                {{--                <div class="custom-control custom-checkbox">--}}
+                {{--                    <input type="checkbox" class="custom-control-input" id="same-address">--}}
+                {{--                    <input type="hidden" value="1200" name="amount" id="total_amount" required/>--}}
+                {{--                    <label class="custom-control-label" for="same-address">Shipping address is the same as my billing--}}
+                {{--                        address</label>--}}
+                {{--                </div>--}}
                 <div class="custom-control custom-checkbox">
                     <input type="checkbox" class="custom-control-input" id="save-info">
                     <label class="custom-control-label" for="save-info">Save this information for next time</label>
@@ -237,7 +242,7 @@
     obj.cus_addr1 = $('#address').val();
     obj.amount = amount.val();
 
-    $('input').change(function() {
+    $('input').change(function () {
         obj.cus_name = $('#customer_name').val();
         obj.cus_phone = $('#mobile').val();
         obj.cus_email = $('#email').val();
