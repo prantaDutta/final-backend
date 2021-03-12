@@ -16,6 +16,7 @@ class CreateLoansTable extends Migration
         Schema::create('loans', static function (Blueprint $table) {
             $table->id();
             $table->decimal('loan_amount');
+            $table->json('lender_ids')->nullable();
             $table->enum('loan_mode',['processing','ongoing','finished']);
             $table->integer('loan_duration');
             $table->integer('interest_rate');

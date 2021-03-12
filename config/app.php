@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    'debug' => (bool)env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -233,4 +233,6 @@ return [
 
     ],
 
+    # This Part is modified by the developers
+    'minimum_distributed_amount' => env('MINIMUM_DISTRIBUTE_AMOUNT', 2000),
 ];

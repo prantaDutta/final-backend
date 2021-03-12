@@ -21,8 +21,13 @@ class LoanPreferenceFactory extends Factory
      */
     public function definition()
     {
+        $numbers = [500, 1000];
+        $random = mt_rand(1, 5);
+        for ($i = 3; $i <= $random; $i++) {
+            $numbers[$i] = 500 * $i;
+        }
         return [
-            //
+            'distributed_amounts' => implode(', ', $numbers),
         ];
     }
 }

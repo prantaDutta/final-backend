@@ -19,7 +19,7 @@ class LoanController extends Controller
         # find the user first
         $user = User::find($id);
 
-        if ($user->loans_count <= 2) {
+        if ($user->loans()->count() <= 2) {
             return response()->json([
                 'error' => 'You Already have two ongoing loans'
             ], 422);

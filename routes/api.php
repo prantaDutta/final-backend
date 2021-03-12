@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Library\DistributedLoans\DistributedBorrowing;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['web']], static function () {
@@ -18,4 +20,10 @@ Route::group(['middleware' => ['web']], static function () {
 
     // Verify Email
     Route::get('/verify-email/{email}/{token}', [UserController::class, 'verifyEmail']);
+
+    // This is temporary
+    Route::get('/testing-distributing/{amount}', static function (Request $request) {
+        $distributed_borrowing = new DistributedBorrowing($request->get('amount'));
+        return $distributed_borrowing->distribute();
+    });
 });

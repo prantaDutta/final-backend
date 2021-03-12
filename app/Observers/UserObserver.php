@@ -18,18 +18,18 @@ class UserObserver
      */
     public function created(User $user)
     {
-        $uniq_id = uniqid('', true);
-        $otp = mt_rand(100000, 999999);
-        $user->util()->create([
-            'email_verify_token' => $uniq_id,
-            'email_verify_otp' => $otp
-        ]);
-        $user->notify(new WelcomeMessage());
-        $user->notify(new VerifyEmail($user->name, $user->email, $otp, $uniq_id));
-
-        $user->loan_preference()->create([
-            'distributed_amounts' => '500, 1000'
-        ]);
+//        $uniq_id = uniqid('', true);
+//        $otp = mt_rand(100000, 999999);
+//        $user->util()->create([
+//            'email_verify_token' => $uniq_id,
+//            'email_verify_otp' => $otp
+//        ]);
+//        $user->notify(new WelcomeMessage());
+//        $user->notify(new VerifyEmail($user->name, $user->email, $otp, $uniq_id));
+//
+//        $user->loan_preference()->create([
+//            'distributed_amounts' => '500, 1000',
+//        ]);
     }
 
     /**
