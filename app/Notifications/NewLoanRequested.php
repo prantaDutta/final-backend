@@ -55,14 +55,15 @@ class NewLoanRequested extends Notification
             ->line('The Interest Rate: ' . $loans->interest_rate . '%')
             ->line('You have to pay ' . $loans->monthly_installment_with_company_fees . 'Tk. every Months')
             ->action('Go to Loans', url(config('app.frontEndUrl')) . '/loans')
-            ->line('Click the button whether your loan is approved');
+            ->line('Thank You, ')
+            ->line('Grayscale');
     }
 
     # Saving data to the database
     public function toDatabase($notifiable)
     {
         return [
-            'msg' => 'You Requested for a new Loan'
+            'msg' => 'You Requested a new Loan'
         ];
     }
 

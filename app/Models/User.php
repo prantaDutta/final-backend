@@ -60,7 +60,7 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @method static Builder|User whereMobileNo($value)
  * @property Carbon|null $mobile_no_verified_at
  * @method static Builder|User whereMobileNoVerifiedAt($value)
- * @property-read \App\Models\LoanPreference|null $loan_preference
+ * @property-read LoanPreference|null $loan_preference
  */
 class User extends Authenticatable
 {

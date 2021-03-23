@@ -45,6 +45,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Util whereMobileNoVerifyOtp($value)
  * @property string|null $temp_email
  * @method static Builder|Util whereTempEmail($value)
+ * @property int $loan_limit
+ * @method static Builder|Util whereLoanLimit($value)
  */
 class Util extends Model
 {

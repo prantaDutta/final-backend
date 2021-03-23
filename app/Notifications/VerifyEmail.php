@@ -3,14 +3,16 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use JetBrains\PhpStorm\ArrayShape;
 
-class VerifyEmail extends Notification
+class VerifyEmail extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public $name, $email, $otp, $uniq_id;
+    protected string $name, $email, $otp, $uniq_id;
 
     /**
      * Create a new notification instance.
@@ -31,10 +33,9 @@ class VerifyEmail extends Notification
     /**
      * Get the notification's delivery channels.
      *
-     * @param mixed $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via(): array
     {
         return ['mail', 'database'];
     }
@@ -42,18 +43,10 @@ class VerifyEmail extends Notification
     /**
      * Get the mail representation of the notification.
      *
-     * @param mixed $notifiable
      * @return MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail(): MailMessage
     {
-//        $uniq_id = uniqid('', true);
-//        $otp = mt_rand(100000, 999999);
-//        $user = User::find($notifiable->id);
-//        $user->util()->update([
-//            'email_verify_token' => $uniq_id,
-//            'email_verify_otp' => $otp
-//        ]);
         return (new MailMessage)
             ->subject('Verification Email')
             ->greeting('Hello ' . $this->name)
@@ -66,7 +59,7 @@ class VerifyEmail extends Notification
     }
 
     # Saving data to the database
-    public function toDatabase($notifiable)
+    #[ArrayShape(['msg' => "string"])] public function toDatabase(): array
     {
         return [
             'msg' => 'Verification Email Sent. Check Inbox'
@@ -76,10 +69,9 @@ class VerifyEmail extends Notification
     /**
      * Get the array representation of the notification.
      *
-     * @param mixed $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray(): array
     {
         return [
             //

@@ -7,6 +7,8 @@ use App\Models\LoanPreference;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\User;
+use App\Models\Util;
+use App\Models\Verification;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -19,11 +21,13 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call(SpecialSeeder::class);
-        User::factory(100)
-            ->has(LoanPreference::factory()->count(1), 'loan_preference')
-            ->has(Loan::factory()->count(1))
-            ->has(Transaction::factory()->count(mt_rand(2, 4))
+        User::factory(1000)
+            ->has(Verification::factory())
+            ->has(LoanPreference::factory(), 'loan_preference')
+            ->has(Loan::factory()->count(random_int(2, 5)))
+            ->has(Transaction::factory()->count(random_int(2, 8))
                 ->has(TransactionDetail::factory()->count(1), 'transaction_detail'))
+            ->has(Util::factory())
             ->create();
     }
 }

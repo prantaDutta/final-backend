@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -21,9 +22,12 @@ class NotificationResource extends JsonResource
             'type' => $this->type,
             'notifiableType' => $this->notifiable_type,
             'notifiableId' => $this->notifiable_id,
+            'diffForHumans' => $this->created_at->diffForHumans(),
             'data' => $this->data,
             'readAt' => $this->read_at,
             'updatedAt' => $this->updated_at
         ];
     }
+
+
 }

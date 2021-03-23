@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Library\LoanDistribution\GenerateLenderDataArray;
 use App\Models\Loan;
-use App\Models\LoanUser;
-use App\Models\User;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class LoanFactory extends Factory
@@ -21,15 +21,12 @@ class LoanFactory extends Factory
      * Define the model's default state.
      *
      * @return array
+     * @throws Exception
      */
     public function definition()
     {
-        LoanUser::create([
-            'user_id' => mt_rand(1,100),
-            'loan_id' => mt_rand(1,100),
-        ]);
+        $decider = random_int(0, 2);
 
-        $decider = mt_rand(0, 2);
         if ($decider === 0) {
             $mode = 'processing';
         } else if ($decider === 1) {
@@ -37,14 +34,20 @@ class LoanFactory extends Factory
         } else {
             $mode = 'finished';
         }
-        $loan_amount = mt_rand(1000, 9999);
-        $loan_duration = mt_rand(1, 18);
-        $interest_rate = mt_rand(5, 15);
+
+        $loan_amount = random_int(1000, 9999);
+        $loan_duration = random_int(1, 18);
+        $interest_rate = random_int(5, 15);
         $interest = $loan_amount * ($interest_rate / 100);
         $company_fees = $loan_amount * 0.02;
-        $loan_start_date = Carbon::today()->subDays(mt_rand(0, 365));
+        $loan_start_date = Carbon::today()->subDays(random_int(0, 365));
+
+        $generate_lender_array = new GenerateLenderDataArray();
+
         return [
             'loan_amount' => $loan_amount,
+            'lender_data' => $generate_lender_array->generate($loan_amount),
+            'unique_loan_id' => uniqid('', true),
             'loan_mode' => $mode,
             'loan_duration' => $loan_duration,
             'interest_rate' => $interest_rate,

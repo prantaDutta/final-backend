@@ -53,6 +53,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Loan whereLoanAmount($value)
  * @property-read DatabaseNotificationCollection|DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
+ * @property mixed|null $lender_ids
+ * @method static Builder|Loan whereLenderIds($value)
  */
 class Loan extends Model
 {
@@ -65,6 +67,7 @@ class Loan extends Model
     protected $casts = [
         'loan_start_date' => 'datetime',
         'loan_end_date' => 'datetime',
+        'lender_data' => 'array',
     ];
 
     use HasFactory, Notifiable;

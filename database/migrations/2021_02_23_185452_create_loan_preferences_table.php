@@ -19,8 +19,8 @@ class CreateLoanPreferencesTable extends Migration
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-            $table->string('distributed_amounts')->nullable();
-//            $table->decimal('latest_deposited_amount')->nullable();
+//            $table->string('distributed_amounts')->nullable();
+            $table->integer('maximum_distributed_amount')->nullable();
             $table->timestamps();
         });
     }

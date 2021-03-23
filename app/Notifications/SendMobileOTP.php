@@ -3,32 +3,37 @@
 namespace App\Notifications;
 
 use App\Models\User;
+use Exception;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Notifications\Messages\NexmoMessage;
 use Illuminate\Notifications\Notification;
+use JetBrains\PhpStorm\ArrayShape;
 
-class SendMobileOTP extends Notification
+class SendMobileOTP extends Notification implements ShouldQueue
 {
     use Queueable;
-    protected $otp;
+
+    protected int $otp;
 
     /**
      * Create a new notification instance.
      *
      * @return void
+     * @throws Exception
      */
     public function __construct()
     {
-        $this->otp = mt_rand(100000, 999999);
+        $this->otp = random_int(100000, 999999);
     }
 
     /**
      * Get the notification's delivery channels.
      *
-     * @param mixed $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via(): array
     {
         return ['database' /*, 'nexmo' */];
     }
@@ -39,9 +44,12 @@ class SendMobileOTP extends Notification
      * @param mixed $notifiable
      * @return array
      */
-    public function toDatabase($notifiable)
+    #[ArrayShape(['msg' => "string"])] public function toDatabase(mixed $notifiable): array
     {
         $user = User::where('email', $notifiable->email)->first();
+        if ($user === null) {
+            throw new ModelNotFoundException();
+        }
         $user->util()->update([
             'mobile_no_verify_otp' => $this->otp
         ]);
@@ -53,11 +61,9 @@ class SendMobileOTP extends Notification
     /**
      * Get the Vonage / SMS representation of the notification.
      *
-     * @param mixed $notifiable
-//     * @return NexmoMessage
-     * @return array
+     * @return NexmoMessage|array
      */
-    public function toNexmo($notifiable)
+    public function toNexmo(): NexmoMessage|array
     {
         // Uncomment this line to send message
 //        return (new NexmoMessage)
@@ -69,10 +75,9 @@ class SendMobileOTP extends Notification
     /**
      * Get the array representation of the notification.
      *
-     * @param mixed $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray(): array
     {
         return [
             //

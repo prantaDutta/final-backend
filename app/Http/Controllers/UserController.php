@@ -365,10 +365,9 @@ class UserController extends Controller
     # Saving Loan Preferences
     public function saveLoanPreferences(Request $request)
     {
-        $distributed_amounts = implode( ', ', $request->get('distributedArray'));
         $user = $request->user();
         $user->loan_preference()->update([
-            'distributed_amounts' => $distributed_amounts,
+            'maximum_distributed_amount' => $request->get('maximumDistributedAmount'),
         ]);
         return response()->json(["OK"], 200);
     }

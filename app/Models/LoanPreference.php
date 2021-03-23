@@ -27,6 +27,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|LoanPreference whereDistributedAmounts($value)
  * @property string $latest_deposited_amount
  * @method static \Illuminate\Database\Eloquent\Builder|LoanPreference whereLatestDepositedAmount($value)
+ * @property int|null $maximum_deposited_amount
+ * @method static \Illuminate\Database\Eloquent\Builder|LoanPreference whereMaximumDepositedAmount($value)
+ * @property int|null $maximum_distributed_amount
+ * @method static \Illuminate\Database\Eloquent\Builder|LoanPreference whereMaximumDistributedAmount($value)
  */
 class LoanPreference extends Model
 {

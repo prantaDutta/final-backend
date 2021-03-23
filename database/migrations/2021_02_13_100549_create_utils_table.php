@@ -13,21 +13,16 @@ class CreateUtilsTable extends Migration
      */
     public function up()
     {
-        Schema::create('utils', function (Blueprint $table) {
+        Schema::create('utils', static function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')
                 ->constrained()
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
-//            $table->string('temp_email')->nullable();
-//            $table->boolean('email_verified')->nullable();
-//            $table->boolean('mobile_no_verified')->nullable();
-//            $table->timestamp('email_verified_at')->nullable();
-//            $table->timestamp('mobile_no_verified_at')->nullable();
             $table->string('email_verify_token')->nullable();
-//            $table->string('mobile_no_verify_token')->nullable();
             $table->string('email_verify_otp')->nullable();
             $table->string('mobile_no_verify_otp')->nullable();
+            $table->integer('loan_limit')->nullable();
             $table->timestamps();
         });
     }

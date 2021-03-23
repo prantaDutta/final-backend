@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Library\LoanDistribution\GenerateLenderDataArray;
+use App\Library\Util\UtilFunctions;
 use App\Models\User;
 use Carbon\Carbon;
 use Faker\Generator;
@@ -57,6 +59,7 @@ class SpecialSeeder extends Seeder
         $company_fees = $loan_amount * 0.02;
         $loan_start_date = Carbon::today()->subDays(mt_rand(0, 365));
 
+        $util = new UtilFunctions();
         $users = [
             [
                 'name' => 'ADMIN',
@@ -103,11 +106,16 @@ class SpecialSeeder extends Seeder
                 'password' => Hash::make('12345678'),
             ],
         ];
+
+        $generate_lender_array = new GenerateLenderDataArray();
+
         foreach ($users as $user) {
             $createdUser = User::create($user);
             for ($i = 0; $i < 5; $i++) {
                 $createdUser->loans()->create([
                     'loan_amount' => $loan_amount,
+                    'lender_data' => $generate_lender_array->generate($loan_amount),
+                    'unique_loan_id' => uniqid('', true),
                     'loan_mode' => $mode,
                     'loan_duration' => $loan_duration,
                     'interest_rate' => $interest_rate,
@@ -131,6 +139,24 @@ class SpecialSeeder extends Seeder
                     'currency' => "BDT",
                 ]);
             }
+            $rand = mt_rand(0, 1);
+            $createdUser->verification()->create([
+                'date_of_birth' => Carbon::now()->subYears(mt_rand(18, 26))->format('Y-m-d'),
+                'gender' => $rand === 0 ? 'male' : 'female',
+                'address' => $this->faker->address,
+                'borrower_type' => $rand === 0 ? 'salaried' : 'self',
+                'division' => 'chattogram',
+                'zila' => 'chattogram',
+                'zip_code' => '4000',
+                'verification_photos' => '{"recentPhoto": "upload_44eda4489b5ceab3cf879117c19785a5.jpg", "addressProof": "upload_6463f29a4f564fd48330f235025919d1.jpg", "nidOrPassport": "upload_4da218498b851729d184d2256eea1ca6.jpg", "bankAccountStatements": "upload_d0b598be4d344630a300fcf09d8c77cb.jpg#upload_f68d7ca36095339e620b3249ab479bec.jpg#upload_e3aba93cb22fb7885ca15572ce88c3e8.jpg#"}',
+            ]);
+            $amounts = [500, 1000, 1500, 2000, 2500, 3000];
+            $createdUser->loan_preference()->create([
+                'maximum_distributed_amount' => $amounts[mt_rand(0, count($amounts) - 1)],
+            ]);
+            $createdUser->util()->create([
+                'loan_limit' => 0,
+            ]);
         }
     }
 

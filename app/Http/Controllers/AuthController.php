@@ -4,11 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use App\Notifications\VerifyEmail;
-use App\Notifications\WelcomeMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
@@ -26,13 +23,13 @@ class AuthController extends Controller
             ],
         ]);
 
-        $user = User::create([
+        User::create([
             'email' => $request->email,
             'name' => $request->name,
             'role' => $request->role,
             'verified' => 'unverified',
             'balance' => 0.00,
-            'password' => Hash::make($request->password)
+            'password' => bcrypt($request->password)
         ]);
 
         $credentials = $request->only('email', 'password');

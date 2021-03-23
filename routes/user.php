@@ -76,7 +76,7 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     Route::get('/get-all-notifications', [UserController::class, 'getAllNotifications']);
 
     // Delete a Notification
-    Route::post('/notification/{id}', [UserController::class, 'deleteNotification']);
+    Route::post('/delete-single-notification/{id}', [UserController::class, 'deleteNotification']);
 
     // Personal User Settings , info should be address, email or mobile no
     Route::post('/personal/{info}', [UserController::class, 'updatePersonalSettings']);

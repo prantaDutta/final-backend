@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Events\NewLoanRequestEvent;
+use App\Listeners\DistributeNewLoanListener;
+use App\Listeners\NewLoanRequestAcceptedNotificationListener;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Observers\TransactionObserver;
@@ -21,6 +24,12 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+
+        # New Loan Request Event
+        NewLoanRequestEvent::class => [
+            NewLoanRequestAcceptedNotificationListener::class,
+            DistributeNewLoanListener::class,
+        ],
     ];
 
     /**
@@ -28,7 +37,7 @@ class EventServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         User::observe(UserObserver::class);
         Transaction::observe(TransactionObserver::class);

@@ -22,7 +22,8 @@ class UserObserver
 //        $otp = mt_rand(100000, 999999);
 //        $user->util()->create([
 //            'email_verify_token' => $uniq_id,
-//            'email_verify_otp' => $otp
+//            'email_verify_otp' => $otp,
+//            'loan_limit' => 0,
 //        ]);
 //        $user->notify(new WelcomeMessage());
 //        $user->notify(new VerifyEmail($user->name, $user->email, $otp, $uniq_id));

@@ -3,10 +3,12 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use JetBrains\PhpStorm\ArrayShape;
 
-class WelcomeMessage extends Notification
+class WelcomeMessage extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -23,10 +25,9 @@ class WelcomeMessage extends Notification
     /**
      * Get the notification's delivery channels.
      *
-     * @param mixed $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via(): array
     {
         return ['mail', 'database'];
     }
@@ -37,7 +38,7 @@ class WelcomeMessage extends Notification
      * @param mixed $notifiable
      * @return MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail(mixed $notifiable): MailMessage
     {
         if ($notifiable->role === "lender") {
             $optionalMsg = 'Lend and Earn Now';
@@ -56,7 +57,7 @@ class WelcomeMessage extends Notification
     }
 
     # Saving data to the database
-    public function toDatabase($notifiable)
+    #[ArrayShape(['msg' => "string"])] public function toDatabase($notifiable): array
     {
         if ($notifiable->role === "lender") {
             $optionalMsg = 'Lend and Earn Now';
@@ -71,10 +72,9 @@ class WelcomeMessage extends Notification
     /**
      * Get the array representation of the notification.
      *
-     * @param mixed $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray(): array
     {
         return [
             //

@@ -13,7 +13,7 @@ class CreateVerificationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('verifications', function (Blueprint $table) {
+        Schema::create('verifications', static function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')
                 ->constrained()

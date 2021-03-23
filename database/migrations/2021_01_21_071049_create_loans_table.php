@@ -11,13 +11,14 @@ class CreateLoansTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('loans', static function (Blueprint $table) {
             $table->id();
             $table->decimal('loan_amount');
-            $table->json('lender_ids')->nullable();
-            $table->enum('loan_mode',['processing','ongoing','finished']);
+            $table->string('unique_loan_id');
+            $table->json('lender_data')->nullable();
+            $table->enum('loan_mode', ['processing', 'ongoing', 'finished', 'calculating']);
             $table->integer('loan_duration');
             $table->integer('interest_rate');
             $table->decimal('amount_with_interest');
@@ -36,7 +37,7 @@ class CreateLoansTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('loans');
     }
