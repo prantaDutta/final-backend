@@ -44,7 +44,7 @@ class SpecialSeeder extends Seeder
      */
     public function run()
     {
-        $decider = mt_rand(0, 2);
+        $decider = random_int(0, 2);
         if ($decider === 0) {
             $mode = 'processing';
         } else if ($decider === 1) {
@@ -52,9 +52,9 @@ class SpecialSeeder extends Seeder
         } else {
             $mode = 'finished';
         }
-        $loan_amount = mt_rand(1000, 9999);
-        $loan_duration = mt_rand(1, 18);
-        $interest_rate = mt_rand(5, 15);
+        $loan_amount = random_int(1000, 9999);
+        $loan_duration = random_int(1, 18);
+        $interest_rate = random_int(5, 15);
         $interest = $loan_amount * ($interest_rate / 100);
         $company_fees = $loan_amount * 0.02;
         $loan_start_date = Carbon::today()->subDays(mt_rand(0, 365));
@@ -90,7 +90,7 @@ class SpecialSeeder extends Seeder
                 'email_verified_at' => now(),
                 'mobile_no_verified_at' => now(),
                 'role' => 'borrower',
-                'verified' => 'unverified',
+                'verified' => 'verified',
                 'balance' => 0.00,
                 'password' => Hash::make('12345678'),
             ],

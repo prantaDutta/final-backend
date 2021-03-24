@@ -43,6 +43,11 @@
     STORE_ID= // this is secret, lol
     STORE_PASSWORD=  // sry, no can do
 ```
+ - Also Change the laravel queue connection to database
+```angular2html
+    # for laravel queue
+    QUEUE_CONNECTION=database
+```
 
 ### Step 7
   - Now Run the development server

@@ -99,6 +99,14 @@ class TestDistributor
 //        $current_loan->update([
 //            'lender_ids' => $this->lender_ids,
 //        ]);
+
+        foreach ($this->lender_data as $lender) {
+            $this->incrementLoanLimit($lender->lender_id);
+            DB::table('users')
+                ->where('id', $lender->lender_id)
+                ->decrement('balance', $lender->amount);
+        }
+
         return response()->json([
             'amount' => $this->amount,
             'distributing_amount' => $this->distributing_amount,
@@ -137,6 +145,11 @@ class TestDistributor
         } while ($user->loan_preference->loan_limit > 5);
 
         $this->incrementLoanLimit($user->id);
+
+        DB::table('users')
+            ->where('id', $user->id)
+            ->decrement('balance', $amount);
+
         return response()->json([
             'lender_data' => new LenderData(
                 $user->id,

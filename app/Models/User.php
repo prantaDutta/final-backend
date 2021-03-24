@@ -97,6 +97,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'mobile_no_verified_at' => 'datetime',
+        'balance' => 'float',
     ];
 
     # User and Verification have a one to one relation

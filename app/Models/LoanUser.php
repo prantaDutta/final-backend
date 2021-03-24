@@ -6,7 +6,10 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 
@@ -31,22 +34,21 @@ use Illuminate\Support\Carbon;
  * @method static Builder|LoanUser whereUpdatedAt($value)
  * @method static Builder|LoanUser whereUserId($value)
  * @mixin Eloquent
- * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
+ * @property-read DatabaseNotificationCollection|DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
  */
-
 class LoanUser extends Pivot
 {
     use HasFactory, Notifiable;
 
     # getting the lenders
-    public function lenders()
+    public function lenders(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->wherePivot('role', 'lender');
     }
 
     # getting the borrowers
-    public function borrowers()
+    public function borrowers(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->wherePivot('role', 'borrower');
     }

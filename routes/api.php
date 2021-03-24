@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Library\LoanDistribution\GenerateLenderDataArray;
 use App\Library\LoanDistribution\TestDistributor;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['web']], static function () {
@@ -32,4 +34,27 @@ Route::group(['middleware' => ['web']], static function () {
         $temp = new GenerateLenderDataArray();
         return $temp->generate($amount);
     });
+
+    Route::get('/random-user', static function () {
+        $lender_ids = [1, 2, 3];
+        do {
+            $user = User::has('transactions')
+                ->inRandomOrder()
+                ->where('role', 'lender')
+                ->whereNotIn('id', $lender_ids)
+                ->whereHas('util', function ($q) {
+                    $q->where('loan_limit', '<=', 5);
+                })
+                ->where('verified', 'verified')
+                ->first();
+
+            if ($user === null) {
+                return response("Error", 500);
+            }
+
+        } while ($user->balance < $user->loan_preference->maximum_distributed_amount);
+
+        return $user;
+    });
+
 });

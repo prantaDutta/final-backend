@@ -49,7 +49,7 @@ class LoanDistributor implements ShouldQueue
     /**
      * This function is called to start the distribution process
      * It uses a while loop to iterate until the loan amount is not
-     *          equal to distributing amount and flag is true
+     *  equal to distributing amount and flag is true
      * @return void
      */
     public function distribute(): void
@@ -104,6 +104,13 @@ class LoanDistributor implements ShouldQueue
         $current_loan->update([
             'lender_data' => $this->lender_data,
         ]);
+
+        foreach ($this->lender_data as $lender) {
+            $this->incrementLoanLimit($lender->lender_id);
+            DB::table('users')
+                ->where('id', $lender->lender_id)
+                ->decrement('balance', $lender->amount);
+        }
 
 //        return response()->json([
 //            'amount' => $this->amount,
@@ -232,7 +239,7 @@ class LoanDistributor implements ShouldQueue
         }
 
         $current_distributed_amount = 500 * $random_number;
-        $this->incrementLoanLimit($user->id);
+//        $this->incrementLoanLimit($user->id);
         return array($user->id, $current_distributed_amount);
     }
 
