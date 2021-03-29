@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\User;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class UserFactory extends Factory
@@ -18,10 +19,11 @@ class UserFactory extends Factory
      * Define the model's default state.
      *
      * @return array
+     * @throws Exception
      */
-    public function definition()
+    public function definition(): array
     {
-        $rand = mt_rand(0, 2);
+        $rand = random_int(0, 2);
         if ($rand === 0) {
             $verified = 'pending';
         } else if ($rand === 1) {

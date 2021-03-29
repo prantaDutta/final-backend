@@ -3,9 +3,10 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Library\LoanDistribution\GenerateLenderDataArray;
+use App\Library\LoanDistribution\LenderData;
 use App\Library\LoanDistribution\TestDistributor;
+use App\Models\Loan;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['web']], static function () {
@@ -43,7 +44,8 @@ Route::group(['middleware' => ['web']], static function () {
                 ->where('role', 'lender')
                 ->whereNotIn('id', $lender_ids)
                 ->whereHas('util', function ($q) {
-                    $q->where('loan_limit', '<=', 5);
+//                    $q->where('loan_limit', '<=', 5);
+                    $q->whereRaw('loan_limit= (select min(`loan_limit`) from utils)');
                 })
                 ->where('verified', 'verified')
                 ->first();
@@ -54,7 +56,32 @@ Route::group(['middleware' => ['web']], static function () {
 
         } while ($user->balance < $user->loan_preference->maximum_distributed_amount);
 
-        return $user;
+        return $user->util;
+    });
+
+    Route::get('/check-amount', static function () {
+        $loan = Loan::findOrFail(3027);
+
+        $the_borrower = $loan->users()
+            ->where('role', 'borrower')->first();
+
+        $the_lenders = $loan->users()
+            ->where('role', 'lender')->get();
+
+        $lender_data = [];
+        foreach ($the_lenders as $lender) {
+            $lender_data[] = [
+                'name' => $lender->name,
+                'id' => $lender->id,
+                'amount' => $lender->pivot->amount,
+            ];
+        }
+
+        return $lender_data;
+
+        return [
+            $the_borrower, $the_lenders
+        ];
     });
 
 });

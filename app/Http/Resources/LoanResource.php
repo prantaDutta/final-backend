@@ -19,11 +19,12 @@ class LoanResource extends JsonResource
             'id' => $this->id,
             'amount' => $this->loan_amount,
             'loanDuration' => $this->loan_duration,
+            'uniqueLoanId' => $this->unique_loan_id,
             'interestRate' => $this->interest_rate,
             'monthlyInstallment' => $this->monthly_installment_with_company_fees,
             'loanMode' => $this->loan_mode,
             'modifiedMonthlyInstallment' => $this->monthly_installment_with_company_fees,
-            'users' => $this->users ? UserResource::collection($this->users) : null
+//            'users' => $this->users ? UserResource::collection($this->users) : null
         ];
     }
 }

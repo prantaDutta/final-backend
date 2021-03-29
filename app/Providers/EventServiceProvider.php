@@ -27,7 +27,6 @@ class EventServiceProvider extends ServiceProvider
 
         # New Loan Request Event
         NewLoanRequestEvent::class => [
-            NewLoanRequestAcceptedNotificationListener::class,
             DistributeNewLoanListener::class,
         ],
     ];

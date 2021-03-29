@@ -18,7 +18,7 @@ class CreateLoansTable extends Migration
             $table->decimal('loan_amount');
             $table->string('unique_loan_id');
             $table->json('lender_data')->nullable();
-            $table->enum('loan_mode', ['processing', 'ongoing', 'finished', 'calculating']);
+            $table->enum('loan_mode', ['processing', 'ongoing', 'finished', 'failed']);
             $table->integer('loan_duration');
             $table->integer('interest_rate');
             $table->decimal('amount_with_interest');

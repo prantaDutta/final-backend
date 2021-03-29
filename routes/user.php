@@ -24,6 +24,13 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
         ]);
     });
 
+    // Get Current User Balance
+    Route::get('/balance', static function (Request $request) {
+        return response()->json([
+            'balance' => $request->user()->balance,
+        ]);
+    });
+
     // is contact-verified
     Route::get('/contact-verified', [UserController::class, 'isContactVerified']);
 

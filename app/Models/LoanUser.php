@@ -41,6 +41,10 @@ class LoanUser extends Pivot
 {
     use HasFactory, Notifiable;
 
+    protected $guarded = [];
+
+    protected $table = 'loan_user';
+
     # getting the lenders
     public function lenders(): BelongsToMany
     {

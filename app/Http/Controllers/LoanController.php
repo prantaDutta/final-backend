@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Events\NewLoanRequestEvent;
 use App\Http\Resources\LoanResource;
+use App\Models\Loan;
 use App\Models\User;
+use App\Notifications\NewLoanRequested;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
@@ -34,7 +36,8 @@ class LoanController extends Controller
         $interest_rate = $values['interestRate'];
         $interest = $amount * ($interest_rate / 100);
         $company_fees = $amount * 0.02;
-        $user->loans()->create([
+
+        Loan::create([
             'loan_amount' => $amount,
             'loan_mode' => 'processing',
             'unique_loan_id' => $unique_loan_id,
@@ -47,8 +50,15 @@ class LoanController extends Controller
             'monthly_installment_with_company_fees' => $values['modifiedMonthlyInstallment']
         ]);
 
-        # This event is not really necessary. But it boosts performance
-        event(new NewLoanRequestEvent($user, $amount, $unique_loan_id));
+        $user->notify(new NewLoanRequested);
+
+        # This event is not really necessary at least for now
+        # But it boosts performance
+        event(new NewLoanRequestEvent(
+            $user, // accepted as borrower in the event and loan distributor
+            $amount,
+            $unique_loan_id
+        ));
 
         return response('OK');
     }

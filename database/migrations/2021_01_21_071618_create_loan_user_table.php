@@ -17,6 +17,7 @@ class CreateLoanUserTable extends Migration
             $table->id();
             $table->unsignedBigInteger('loan_id');
             $table->unsignedBigInteger('user_id');
+            $table->integer('amount');
             $table->timestamps();
         });
     }

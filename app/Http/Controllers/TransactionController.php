@@ -17,7 +17,7 @@ class TransactionController extends Controller
         $user = User::find($id);
         $deposits = $user->transactions()
             ->where('user_id', $id)
-            ->where('transaction_type','deposit')
+            ->where('transaction_type', 'deposit')
             ->orderByDesc('created_at')->get();
 
         if ($deposits) {
@@ -27,7 +27,7 @@ class TransactionController extends Controller
             ], 200);
         }
 
-        return response()->json([],200);
+        return response()->json([], 200);
     }
 
     // get all withdrawals
@@ -37,7 +37,7 @@ class TransactionController extends Controller
         $user = User::find($id);
         $withdrawals = $user->transactions()
             ->where('user_id', $id)
-            ->where('transaction_type','withdraw')
+            ->where('transaction_type', 'withdraw')
             ->get();
 
         if ($withdrawals) {
@@ -47,7 +47,7 @@ class TransactionController extends Controller
             ], 200);
         }
 
-        return response()->json([],200);
+        return response()->json([], 200);
     }
 
     // Withdraw Money
@@ -69,7 +69,7 @@ class TransactionController extends Controller
         $user->transactions()->updateOrCreate([
             'name' => $user->name,
             'email' => $user->email,
-            'phone' => '880' . $user->verification->mobile_no,
+            'phone' => $user->mobile_no,
             'amount' => $values['amount'],
             'status' => 'Pending',
             'address' => $user->verification->address,
@@ -79,11 +79,19 @@ class TransactionController extends Controller
         ]);
 
         // Saving the data to the transaction Details table
-        $current_transaction = Transaction::where('transaction_id',$trxID)->first();
+        $current_transaction = Transaction::where('transaction_id', $trxID)
+            ->first();
+
+        if ($current_transaction === null) {
+            return response()->json([
+                "Error" => "Transaction Not Found"
+            ], 500);
+        }
+
         $current_transaction->transaction_detail()->updateOrCreate([
-            'card_type' => strtoupper($values['method'])."-".ucfirst($values['method']),
+            'card_type' => strtoupper($values['method']) . "-" . ucfirst($values['method']),
 //            'card_no' => "N/A",
-            'bank_tran_id' => uniqid("",true),
+            'bank_tran_id' => uniqid("", true),
 //            'error' => "N/A",
             'card_issuer' => ucfirst($values['method']) . " Mobile Banking",
             'card_brand' => "MOBILE BANKING",
@@ -91,6 +99,6 @@ class TransactionController extends Controller
             'risk_title' => "Safe"
         ]);
 
-        return response()->json(["OK"],200);
+        return response()->json(["OK"]);
     }
 }

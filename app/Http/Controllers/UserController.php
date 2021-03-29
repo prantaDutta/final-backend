@@ -13,7 +13,7 @@ use App\Models\Util;
 use App\Notifications\EmailVerified;
 use App\Notifications\MobileNoVerified;
 use App\Notifications\SendMobileOTP;
-use App\Notifications\VerifyEmail;
+use App\Notifications\SendVerifyEmailOTP;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -76,7 +76,7 @@ class UserController extends Controller
             'email_verify_otp' => $otp
         ]);
         Notification::route('mail', [$email => $user->name])
-            ->notify(new VerifyEmail($user->name, $email, $otp, $uniq_id));
+            ->notify(new SendVerifyEmailOTP($user->name, $email, $otp, $uniq_id));
         return response()->json(["OK"], 200);
     }
 

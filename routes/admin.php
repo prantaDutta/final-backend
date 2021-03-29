@@ -46,4 +46,7 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
 
     // Transaction Successful Or Failed
     Route::get('/transaction/{type}/{id}',[AdminController::class, 'markTransaction']);
+
+    // Get Single Loan Details
+    Route::get('/get-single-loan/{id}', [AdminController::class, 'getSingleLoan']);
 });

@@ -8,9 +8,9 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use JetBrains\PhpStorm\ArrayShape;
 
-class VerifyEmail extends Notification implements ShouldQueue
+class SendVerifyEmailOTP extends Notification implements ShouldQueue
 {
-//    use Queueable;
+    use Queueable;
 
     protected string $name, $email, $otp, $uniq_id;
 

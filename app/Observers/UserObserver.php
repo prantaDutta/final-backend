@@ -3,7 +3,7 @@
 namespace App\Observers;
 
 use App\Models\User;
-use App\Notifications\VerifyEmail;
+use App\Notifications\SendVerifyEmailOTP;
 use App\Notifications\WelcomeMessage;
 use Illuminate\Bus\Queueable;
 
@@ -26,7 +26,7 @@ class UserObserver
 //            'loan_limit' => 0,
 //        ]);
 //        $user->notify(new WelcomeMessage());
-//        $user->notify(new VerifyEmail($user->name, $user->email, $otp, $uniq_id));
+//        $user->notify(new SendVerifyEmailOTP($user->name, $user->email, $otp, $uniq_id));
 //
 //        $user->loan_preference()->create([
 //            'distributed_amounts' => '500, 1000',

@@ -25,7 +25,11 @@ class DistributeNewLoanListener implements ShouldQueue
      */
     public function handle(object $event): void
     {
-        $loan_distributor = new LoanDistributor($event->amount, $event->unique_loan_id);
+        $loan_distributor = new LoanDistributor(
+            $event->user,
+            $event->amount,
+            $event->unique_loan_id,
+        );
 
         $loan_distributor->distribute();
     }

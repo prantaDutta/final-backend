@@ -6,7 +6,6 @@ use App\Models\Loan;
 use App\Models\LoanPreference;
 use App\Models\User;
 use Exception;
-use Illuminate\Bus\Queueable;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -89,29 +88,47 @@ class TestDistributor
         info('Distribution Successful');
         info("##################################################");
 
-        # Saving the data to the database
-        $current_loan = Loan::where('unique_loan_id', $this->unique_loan_id)
+        # Finding the current loan
+        $current_loan = Loan::where('unique_loan_id', '605c31d87a58a2.54056453')
             ->first();
+
         if (!$current_loan) {
             $this->handleNotFound();
         }
 
-//        $current_loan->update([
-//            'lender_ids' => $this->lender_ids,
-//        ]);
-
+        # Saving the data to the database
         foreach ($this->lender_data as $lender) {
-            $this->incrementLoanLimit($lender->lender_id);
-            DB::table('users')
-                ->where('id', $lender->lender_id)
-                ->decrement('balance', $lender->amount);
+//            $this->incrementLoanLimit($lender->lender_id);
+
+            $user = User::find($lender->lender_id);
+
+            $user->loans()->attach($current_loan, [
+                'amount' => $lender->amount,
+            ]);
+
+//            $this->decrementLenderBalance($lender->lender_id, $lender->amount);
         }
+
+        $the_borrower = $current_loan->users()
+            ->where('role', 'borrower')
+            ->first();
+
+        $this->incrementBorrowerBalance($the_borrower->id, $this->amount);
 
         return response()->json([
             'amount' => $this->amount,
             'distributing_amount' => $this->distributing_amount,
-            'lender_data' => $this->lender_data
+            'lender_data' => $this->lender_data,
+            'the_borrower' => $the_borrower
         ]);
+
+    }
+
+    protected function incrementBorrowerBalance($id, $amount): void
+    {
+        DB::table('users')
+            ->where('id', $id)
+            ->increment('balance', $amount);
     }
 
     /**
@@ -133,18 +150,38 @@ class TestDistributor
         info('Inside the Lesser Amount function');
         $amount = $this->amount;
 
-        # Every do-while loop executes first and then checks the condition
-        do {
-            $loan_preference = LoanPreference::where('maximum_distributed_amount', $amount)->first();
+        $loan_preference = LoanPreference::where('maximum_distributed_amount', $amount)->first();
 
-            if ($loan_preference === null) {
-                $this->handleNotFound();
-            }
+        if ($loan_preference === null) {
+            $this->handleNotFound();
+        }
 
-            $user = User::findOrFail($loan_preference->user_id);
-        } while ($user->loan_preference->loan_limit > 5);
+        $user = User::has('transactions')
+            ->inRandomOrder()
+            ->where('role', 'lender')
+            ->where('balance', '>=', $amount)
+            ->whereHas('util', function ($q) {
+                $q->where('loan_limit', '<=', 5);
+            })
+            ->where('verified', 'verified')
+            ->first();
 
-        $this->incrementLoanLimit($user->id);
+        if ($user === null) {
+            $this->handleNotFound();
+        }
+
+        # Finding the current loan
+        $current_loan = Loan::where('unique_loan_id', '605c24611911e8.75297410')
+            ->first();
+
+        if (!$current_loan) {
+            $this->handleNotFound();
+        }
+
+        $user->loans()->attach(2036);
+
+//        $this->incrementLoanLimit($user->id);
+
 
         DB::table('users')
             ->where('id', $user->id)
@@ -167,18 +204,6 @@ class TestDistributor
         return response()->json([
             'error' => 'Null User Found',
         ], 500);
-    }
-
-    /**
-     * incrementing loan limit
-     * @param $id
-     * @return int
-     */
-    protected function incrementLoanLimit($id): int
-    {
-        return DB::table('utils')
-            ->where('user_id', $id)
-            ->increment('loan_limit');
     }
 
     /**
@@ -288,5 +313,17 @@ class TestDistributor
         }
 
         return true;
+    }
+
+    /**
+     * incrementing loan limit
+     * @param $id
+     * @return int
+     */
+    protected function incrementLoanLimit($id): int
+    {
+        return DB::table('utils')
+            ->where('user_id', $id)
+            ->increment('loan_limit');
     }
 }

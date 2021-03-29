@@ -23,16 +23,18 @@ class LoanFactory extends Factory
      * @return array
      * @throws Exception
      */
-    public function definition()
+    public function definition(): array
     {
-        $decider = random_int(0, 2);
+        $decider = random_int(0, 3);
 
         if ($decider === 0) {
             $mode = 'processing';
         } else if ($decider === 1) {
             $mode = 'ongoing';
-        } else {
+        } else if ($decider === 2) {
             $mode = 'finished';
+        } else {
+            $mode = 'failed';
         }
 
         $loan_amount = random_int(1000, 9999);
@@ -40,7 +42,7 @@ class LoanFactory extends Factory
         $interest_rate = random_int(5, 15);
         $interest = $loan_amount * ($interest_rate / 100);
         $company_fees = $loan_amount * 0.02;
-        $loan_start_date = Carbon::today()->subDays(random_int(0, 365));
+//        $loan_start_date = Carbon::today()->subDays(random_int(0, 365));
 
         $generate_lender_array = new GenerateLenderDataArray();
 
@@ -56,8 +58,8 @@ class LoanFactory extends Factory
             'amount_with_interest_and_company_fees' => $loan_amount + $interest + $company_fees,
             'monthly_installment' => ($loan_amount + $interest) / $loan_duration,
             'monthly_installment_with_company_fees' => ($loan_amount + $interest + $company_fees) / $loan_duration,
-            'loan_start_date' => $loan_start_date,
-            'loan_end_date' => $loan_start_date->addMonths($loan_duration),
+            'loan_start_date' => Carbon::today()->subDays(random_int(0, 365)),
+            'loan_end_date' => Carbon::today()->addMonths(random_int(3, 18)),
         ];
     }
 }

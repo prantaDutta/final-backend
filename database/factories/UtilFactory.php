@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Util;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class UtilFactory extends Factory

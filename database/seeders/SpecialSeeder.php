@@ -3,9 +3,10 @@
 namespace Database\Seeders;
 
 use App\Library\LoanDistribution\GenerateLenderDataArray;
-use App\Library\Util\UtilFunctions;
+use App\Models\Loan;
 use App\Models\User;
 use Carbon\Carbon;
+use Exception;
 use Faker\Generator;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -14,12 +15,13 @@ use Illuminate\Support\Facades\Hash;
 
 class SpecialSeeder extends Seeder
 {
-    private $faker;
+    private Generator $faker;
 
     /**
      * Create a new seeder instance.
      *
      * @return void
+     * @throws BindingResolutionException
      */
     public function __construct()
     {
@@ -32,7 +34,7 @@ class SpecialSeeder extends Seeder
      * @return Generator
      * @throws BindingResolutionException
      */
-    protected function withFaker()
+    protected function withFaker(): Generator
     {
         return Container::getInstance()->make(Generator::class);
     }
@@ -41,8 +43,9 @@ class SpecialSeeder extends Seeder
      * Run the database seeds.
      *
      * @return void
+     * @throws Exception
      */
-    public function run()
+    public function run(): void
     {
         $decider = random_int(0, 2);
         if ($decider === 0) {
@@ -57,9 +60,8 @@ class SpecialSeeder extends Seeder
         $interest_rate = random_int(5, 15);
         $interest = $loan_amount * ($interest_rate / 100);
         $company_fees = $loan_amount * 0.02;
-        $loan_start_date = Carbon::today()->subDays(mt_rand(0, 365));
+        $loan_start_date = Carbon::today()->subDays(random_int(0, 365));
 
-        $util = new UtilFunctions();
         $users = [
             [
                 'name' => 'ADMIN',
@@ -112,7 +114,7 @@ class SpecialSeeder extends Seeder
         foreach ($users as $user) {
             $createdUser = User::create($user);
             for ($i = 0; $i < 5; $i++) {
-                $createdUser->loans()->create([
+                $created_loan = Loan::create([
                     'loan_amount' => $loan_amount,
                     'lender_data' => $generate_lender_array->generate($loan_amount),
                     'unique_loan_id' => uniqid('', true),
@@ -124,24 +126,27 @@ class SpecialSeeder extends Seeder
                     'amount_with_interest_and_company_fees' => $loan_amount + $interest + $company_fees,
                     'monthly_installment' => ($loan_amount + $interest) / $loan_duration,
                     'monthly_installment_with_company_fees' => ($loan_amount + $interest + $company_fees) / $loan_duration,
-//                    'loan_start_date' => $loan_start_date,
-//                    'loan_end_date' => $loan_start_date->addMonths($loan_duration),
+                    'loan_start_date' => $loan_start_date,
+                    'loan_end_date' => $loan_start_date->addMonths($loan_duration),
                 ]);
+
+                $createdUser->loans()->attach($created_loan, ['amount' => 500]);
+
                 $createdUser->transactions()->create([
                     'name' => $this->faker->name,
                     'email' => $this->faker->email,
-                    'phone' => 8801 . mt_rand(311111111, 999999999),
-                    'amount' => mt_rand(1000, 9999),
-                    'status' => mt_rand(0, 2) === 0 ? "Pending" : "Completed",
+                    'phone' => 8801 . random_int(311111111, 999999999),
+                    'amount' => random_int(1000, 9999),
+                    'status' => random_int(0, 2) === 0 ? "Pending" : "Completed",
                     'address' => $this->faker->address,
                     'transaction_id' => uniqid('', true),
-                    'transaction_type' => mt_rand(0, 1) === 0 ? "deposit" : "withdraw",
+                    'transaction_type' => random_int(0, 1) === 0 ? "deposit" : "withdraw",
                     'currency' => "BDT",
                 ]);
             }
-            $rand = mt_rand(0, 1);
+            $rand = random_int(0, 1);
             $createdUser->verification()->create([
-                'date_of_birth' => Carbon::now()->subYears(mt_rand(18, 26))->format('Y-m-d'),
+                'date_of_birth' => Carbon::now()->subYears(random_int(18, 26))->format('Y-m-d'),
                 'gender' => $rand === 0 ? 'male' : 'female',
                 'address' => $this->faker->address,
                 'borrower_type' => $rand === 0 ? 'salaried' : 'self',
@@ -152,7 +157,7 @@ class SpecialSeeder extends Seeder
             ]);
             $amounts = [500, 1000, 1500, 2000, 2500, 3000];
             $createdUser->loan_preference()->create([
-                'maximum_distributed_amount' => $amounts[mt_rand(0, count($amounts) - 1)],
+                'maximum_distributed_amount' => $amounts[random_int(0, count($amounts) - 1)],
             ]);
             $createdUser->util()->create([
                 'loan_limit' => 0,

@@ -6,6 +6,9 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
@@ -101,31 +104,33 @@ class User extends Authenticatable
     ];
 
     # User and Verification have a one to one relation
-    public function verification()
+    public function verification(): HasOne
     {
         return $this->hasOne(Verification::class);
     }
 
     # User and Loan have a many to many relation
-    public function loans()
+    public function loans(): BelongsToMany
     {
-        return $this->belongsToMany(Loan::class);
+        return $this->belongsToMany(Loan::class)
+            ->latest()
+            ->withPivot('amount');
     }
 
     # User and Transaction have a one to many relation
-    public function transactions()
+    public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
     }
 
     # User and Util have a one to one relation
-    public function util()
+    public function util(): HasOne
     {
         return $this->hasOne(Util::class);
     }
 
     # User and Loan Preference have a one to one relation
-    public function loan_preference()
+    public function loan_preference(): HasOne
     {
         return $this->hasOne(LoanPreference::class);
     }
@@ -136,7 +141,7 @@ class User extends Authenticatable
      * @param Notification $notification
      * @return string
      */
-    public function routeNotificationForNexmo($notification)
+    public function routeNotificationForNexmo($notification): int|string|null
     {
         return $this->mobile_no;
     }

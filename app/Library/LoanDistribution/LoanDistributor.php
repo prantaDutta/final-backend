@@ -34,11 +34,12 @@ class LoanDistributor implements ShouldQueue
     /**
      * LoanDistributor constructor.
      * Initializes the distribution amount
+     * @param mixed $the_borrower
      * @param int $amount
      * @param string $unique_loan_id
-     * @return void
      */
     public function __construct(
+        protected mixed $the_borrower,
         protected int $amount,
         // to find the loan to distribute
         protected string $unique_loan_id,
@@ -57,6 +58,7 @@ class LoanDistributor implements ShouldQueue
         # Checks whether it's distributable
         if ($this->isDistributable() === false) {
             $this->distributeALesserAmount();
+            return;
         }
 
         while ($this->flag === false) {
@@ -105,12 +107,28 @@ class LoanDistributor implements ShouldQueue
             'lender_data' => $this->lender_data,
         ]);
 
+        // attaching the loan to the borrower
+        $this->the_borrower->loans()->attach($current_loan, ['amount' => $this->amount]);
+
         foreach ($this->lender_data as $lender) {
+
             $this->incrementLoanLimit($lender->lender_id);
-            DB::table('users')
-                ->where('id', $lender->lender_id)
-                ->decrement('balance', $lender->amount);
+
+            $user = User::find($lender->lender_id);
+
+            # Attaching the loan to the lenders
+            $user->loans()->attach($current_loan, [
+                'amount' => $lender->amount,
+            ]);
+
+            $this->decrementLenderBalance($lender->lender_id, $lender->amount);
         }
+
+//        $the_borrower = $current_loan->users()
+//            ->where('role', 'borrower')
+//            ->first();
+
+        $this->incrementBorrowerBalance($this->the_borrower->id, $this->amount);
 
 //        return response()->json([
 //            'amount' => $this->amount,
@@ -131,26 +149,63 @@ class LoanDistributor implements ShouldQueue
     /**
      * If the amount is not distributable, this function will get called
      * It will find an user with the loan amount and return it
-     * @return JsonResponse
+     * @return void
      */
-    protected function distributeALesserAmount(): JsonResponse
+    protected function distributeALesserAmount(): void
     {
         info('Inside the Lesser Amount function');
         $amount = $this->amount;
 
-        # Every do-while loop executes first and then checks the condition
-        do {
-            $loan_preference = LoanPreference::where('maximum_distributed_amount', $amount)->first();
+        $loan_preference = LoanPreference::where('maximum_distributed_amount', $amount)->first();
 
-            if ($loan_preference === null) {
-                $this->handleNotFound();
-            }
+        if ($loan_preference === null) {
+            $this->handleNotFound();
+        }
 
-            $user = User::findOrFail($loan_preference->user_id);
-        } while ($user->loan_preference->loan_limit > 5);
+        $user = User::has('transactions')
+            ->inRandomOrder()
+            ->where('role', 'lender')
+            ->where('balance', '>=', $amount)
+            ->whereHas('util', function ($q) {
+//                $q->where('loan_limit', '<=', 5);
+                $q->whereRaw('loan_limit= (select min(`loan_limit`) from utils)');
+            })
+            ->where('verified', 'verified')
+            ->first();
+
+        if ($user === null) {
+            $this->handleNotFound();
+        }
+
+        info("##################################################");
+        info('Distribution Successful');
+        info("##################################################");
+
+        # Saving the data to the database
+        $current_loan = Loan::where('unique_loan_id', $this->unique_loan_id)
+            ->first();
+
+        if (!$current_loan) {
+            $this->handleNotFound();
+        }
+
+        // attaching the loan to the borrower
+        $this->the_borrower->loans()->attach($current_loan, ['amount' => $this->amount]);
+
+        # attaching the loan to the lender
+        $user->loans()->attach($current_loan, ['amount' => $this->amount]);
 
         $this->incrementLoanLimit($user->id);
-        return response()->json([
+
+        $this->decrementLenderBalance($user->id, $amount);
+
+//        $the_borrower = $current_loan->users()
+//            ->where('role', 'borrower')
+//            ->first();
+
+        $this->incrementBorrowerBalance($this->the_borrower->id, $amount);
+
+        $current_loan->update([
             'lender_data' => new LenderData(
                 $user->id,
                 $this->amount,
@@ -164,6 +219,16 @@ class LoanDistributor implements ShouldQueue
      */
     protected function handleNotFound(): JsonResponse
     {
+        $current_loan = Loan::where('unique_loan_id', $this->unique_loan_id)
+            ->first();
+
+        $this->the_borrower->loans()
+            ->attach($current_loan, ['amount' => $this->amount]);
+
+        $current_loan->update([
+            'loan_mode' => 'failed',
+        ]);
+
         return response()->json([
             'error' => 'Null User Found',
         ], 500);
@@ -179,6 +244,20 @@ class LoanDistributor implements ShouldQueue
         return DB::table('utils')
             ->where('user_id', $id)
             ->increment('loan_limit');
+    }
+
+    protected function decrementLenderBalance($id, $amount): void
+    {
+        DB::table('users')
+            ->where('id', $id)
+            ->decrement('balance', $amount);
+    }
+
+    protected function incrementBorrowerBalance($id, $amount): void
+    {
+        DB::table('users')
+            ->where('id', $id)
+            ->increment('balance', $amount);
     }
 
     /**
@@ -255,7 +334,8 @@ class LoanDistributor implements ShouldQueue
                 ->where('role', 'lender')
                 ->whereNotIn('id', $this->lender_ids)
                 ->whereHas('util', function ($q) {
-                    $q->where('loan_limit', '<=', 5);
+//                    $q->where('loan_limit', '<=', 5);
+                    $q->whereRaw('loan_limit= (select min(`loan_limit`) from utils)');
                 })
                 ->where('verified', 'verified')
                 ->first();

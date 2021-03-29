@@ -73,8 +73,10 @@ class Loan extends Model
     use HasFactory, Notifiable;
 
     # User and Loan have a many to many relation
-    public function users()
+    public function users(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class)
+            ->latest()
+            ->withPivot('amount');
     }
 }
