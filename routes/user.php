@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InstallmentController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\SslCommerzPaymentController;
 use App\Http\Controllers\TransactionController;
@@ -96,4 +97,13 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
 //
     // Saving Loan Preference
     Route::post('/save-loan-preferences', [UserController::class, 'saveLoanPreferences']);
+
+    // get all installments
+    Route::get('/get-all-installments/{type}', [InstallmentController::class, 'getAllInstallments']);
+
+    // get single Installment
+    Route::get('/get-single-installment/{id}', [InstallmentController::class, 'getSingleInstallment']);
+
+    // Pay Installment
+    Route::post('/pay-installment', [InstallmentController::class, 'payInstallment']);
 });

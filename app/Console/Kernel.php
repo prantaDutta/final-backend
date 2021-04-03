@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
 //        $schedule->command('command:control-loan-limit')->daily();
-        $schedule->command('command:control-loan-limit')->everyMinute();
+        $schedule->command('command:run-everyday')->everyMinute();
     }
 
     /**

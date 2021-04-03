@@ -42,6 +42,7 @@ use Illuminate\Notifications\Notifiable;
  * @method static \Illuminate\Database\Eloquent\Builder|TransactionDetail whereTransactionId($value)
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
+ * @method static \Database\Factories\TransactionDetailFactory factory(...$parameters)
  */
 class TransactionDetail extends Model
 {

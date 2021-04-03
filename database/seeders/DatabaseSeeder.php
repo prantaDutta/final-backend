@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Installment;
 use App\Models\Loan;
 use App\Models\LoanPreference;
 use App\Models\Transaction;
@@ -19,17 +20,18 @@ class DatabaseSeeder extends Seeder
      * @return void
      * @throws \Exception
      */
-    public function run()
+    public function run(): void
     {
         $this->call(SpecialSeeder::class);
-        User::factory(1000)
-            ->has(Verification::factory())
-            ->has(LoanPreference::factory(), 'loan_preference')
-//            ->has(Loan::factory()->count(random_int(2, 5)))
-            ->hasAttached(Loan::factory()->count(random_int(2, 5)), ['amount' => 500])
-            ->has(Transaction::factory()->count(random_int(2, 5))
-                ->has(TransactionDetail::factory()->count(1), 'transaction_detail'))
-            ->has(Util::factory())
-            ->create();
+//        User::factory(1000)
+//            ->has(Verification::factory())
+//            ->has(LoanPreference::factory(), 'loan_preference')
+////            ->has(Loan::factory()->count(random_int(2, 5)))
+//            ->hasAttached(Loan::factory()->count(random_int(2, 5)), ['amount' => 500])
+//            ->has(Transaction::factory()->count(random_int(2, 5))
+//                ->has(TransactionDetail::factory()->count(1), 'transaction_detail'))
+//            ->has(Util::factory())
+//            ->has(Installment::factory()->count(random_int(3, 10)))
+//            ->create();
     }
 }

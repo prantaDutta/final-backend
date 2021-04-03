@@ -36,6 +36,8 @@ use Illuminate\Support\Carbon;
  * @mixin Eloquent
  * @property-read DatabaseNotificationCollection|DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
+ * @property int $amount
+ * @method static Builder|LoanUser whereAmount($value)
  */
 class LoanUser extends Pivot
 {

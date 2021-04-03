@@ -47,6 +47,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Util whereTempEmail($value)
  * @property int $loan_limit
  * @method static Builder|Util whereLoanLimit($value)
+ * @method static \Database\Factories\UtilFactory factory(...$parameters)
  */
 class Util extends Model
 {

@@ -55,6 +55,13 @@ use Illuminate\Support\Carbon;
  * @property-read int|null $notifications_count
  * @property mixed|null $lender_ids
  * @method static Builder|Loan whereLenderIds($value)
+ * @property string $unique_loan_id
+ * @property array|null $lender_data
+ * @property-read Collection|\App\Models\Installment[] $installments
+ * @property-read int|null $installments_count
+ * @method static Builder|Loan whereLenderData($value)
+ * @method static Builder|Loan whereUniqueLoanId($value)
+ * @method static \Database\Factories\LoanFactory factory(...$parameters)
  */
 class Loan extends Model
 {
@@ -78,5 +85,11 @@ class Loan extends Model
         return $this->belongsToMany(User::class)
             ->latest()
             ->withPivot('amount');
+    }
+
+    # Loan and Installment have a one to many relationship
+    public function installments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Installment::class);
     }
 }

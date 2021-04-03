@@ -58,8 +58,8 @@ class LoanFactory extends Factory
             'amount_with_interest_and_company_fees' => $loan_amount + $interest + $company_fees,
             'monthly_installment' => ($loan_amount + $interest) / $loan_duration,
             'monthly_installment_with_company_fees' => ($loan_amount + $interest + $company_fees) / $loan_duration,
-            'loan_start_date' => Carbon::today()->subDays(random_int(0, 365)),
-            'loan_end_date' => Carbon::today()->addMonths(random_int(3, 18)),
+//            'loan_start_date' => Carbon::today()->subDays(random_int(0, 365)),
+//            'loan_end_date' => Carbon::today()->addMonths(random_int(3, 18)),
         ];
     }
 }

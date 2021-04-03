@@ -64,6 +64,10 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property Carbon|null $mobile_no_verified_at
  * @method static Builder|User whereMobileNoVerifiedAt($value)
  * @property-read LoanPreference|null $loan_preference
+ * @property-read Collection|Installment[] $installments
+ * @property-read int|null $installments_count
+ * @property-read \App\Models\Administration|null $administration
+ * @method static \Database\Factories\UserFactory factory(...$parameters)
  */
 class User extends Authenticatable
 {
@@ -133,6 +137,18 @@ class User extends Authenticatable
     public function loan_preference(): HasOne
     {
         return $this->hasOne(LoanPreference::class);
+    }
+
+    # User(Admin) and administration has a one to one relation
+    public function administration(): HasOne
+    {
+        return $this->hasOne(Administration::class);
+    }
+
+    # User and Installment have a one to many relationship
+    public function installments(): HasMany
+    {
+        return $this->hasMany(Installment::class);
     }
 
     /**

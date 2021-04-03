@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\InstallmentResource;
 use App\Http\Resources\LoanResource;
 use App\Http\Resources\TransactionDetailResource;
 use App\Http\Resources\TransactionResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\VerificationResource;
+use App\Models\Administration;
+use App\Models\Installment;
 use App\Models\Loan;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
@@ -159,5 +163,46 @@ class AdminController extends Controller
             ],
             'theLenders' => $lender_data,
         ]);
+    }
+
+    // Get All Installments
+    public function getAllInstallments($status): JsonResponse
+    {
+        if ($status !== 'all') {
+            $installments = Installment::where('status', $status)->get();
+        } else {
+            $installments = Installment::all();
+        }
+
+        return response()->json([
+            'installments' => InstallmentResource::collection($installments),
+        ]);
+    }
+
+    // Get Penalty Data
+    public function getPenaltyData(Request $request)
+    {
+        $user = $request->user();
+        return response()->json([
+            'penaltyData' => $user->administration->penalty_data,
+        ]);
+    }
+
+    // update penalty data
+    public function updatePenaltyData(Request $request)
+    {
+        $user = $request->user();
+        if ($user->role !== 'admin') {
+            return response()->json(["ERROR"], 500);
+        }
+
+        $penalty_data = $request->get('penaltyData');
+
+        $administration = Administration::first();
+        $administration->update([
+            'penalty_data' => $penalty_data,
+        ]);
+
+        return response()->json(['OK']);
     }
 }

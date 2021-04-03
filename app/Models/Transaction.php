@@ -44,6 +44,7 @@ use Illuminate\Support\Carbon;
  * @property-read TransactionDetail|null $transaction_detail
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
+ * @method static \Database\Factories\TransactionFactory factory(...$parameters)
  */
 class Transaction extends Model
 {

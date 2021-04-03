@@ -49,6 +49,7 @@ use Illuminate\Support\Carbon;
  * @property-read int|null $notifications_count
  * @property string|null $mobile_no_verified_at
  * @method static Builder|Verification whereMobileNoVerifiedAt($value)
+ * @method static \Database\Factories\VerificationFactory factory(...$parameters)
  */
 class Verification extends Model
 {

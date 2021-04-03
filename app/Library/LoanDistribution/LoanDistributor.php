@@ -16,7 +16,7 @@ class LoanDistributor implements ShouldQueue
 {
     use Queueable;
 
-    // adds every maximum distributed amount
+    // adds every maximum distributed amount until its equal to amount
     protected int $distributing_amount = 0;
 
     // when true, the loan will be distributed
@@ -34,12 +34,12 @@ class LoanDistributor implements ShouldQueue
     /**
      * LoanDistributor constructor.
      * Initializes the distribution amount
-     * @param mixed $the_borrower
+     * @param User $the_borrower
      * @param int $amount
      * @param string $unique_loan_id
      */
     public function __construct(
-        protected mixed $the_borrower,
+        protected User $the_borrower,
         protected int $amount,
         // to find the loan to distribute
         protected string $unique_loan_id,
@@ -49,17 +49,19 @@ class LoanDistributor implements ShouldQueue
 
     /**
      * This function is called to start the distribution process
-     * It uses a while loop to iterate until the loan amount is not
-     *  equal to distributing amount and flag is true
+     *
      * @return void
      */
     public function distribute(): void
     {
         # Checks whether it's distributable
-        if ($this->isDistributable() === false) {
-            $this->distributeALesserAmount();
-            return;
-        }
+//        if ($this->isDistributable() === false) {
+//            $this->distributeALesserAmount();
+//            return;
+//        }
+
+        #   Using a while loop to iterate until the loan amount is not
+        #   equal to distributing amount and flag is true
 
         while ($this->flag === false) {
             if ($this->amount > $this->distributing_amount) {
@@ -122,6 +124,15 @@ class LoanDistributor implements ShouldQueue
             ]);
 
             $this->decrementLenderBalance($lender->lender_id, $lender->amount);
+
+            # Creating [loan_duration] installments for the lender
+            $lender_installment_amount = $lender->amount / $current_loan->loan_duration;
+
+            $this->createInstallmentForOneUser(
+                $user,
+                $current_loan,
+                $lender_installment_amount,
+            );
         }
 
 //        $the_borrower = $current_loan->users()
@@ -130,134 +141,19 @@ class LoanDistributor implements ShouldQueue
 
         $this->incrementBorrowerBalance($this->the_borrower->id, $this->amount);
 
+        # Creating [loan_duration] installments for the borrower
+        $borrower_installment_amount = $current_loan->monthly_installment_with_company_fees;
+
+        $this->createInstallmentForOneUser(
+            $this->the_borrower,
+            $current_loan,
+            $borrower_installment_amount,
+        );
 //        return response()->json([
 //            'amount' => $this->amount,
 //            'distributing_amount' => $this->distributing_amount,
 //            'lender_data' => $this->lender_data
 //        ]);
-    }
-
-    /**
-     * This function checks whether the amount is distributable or not
-     * @return bool
-     */
-    protected function isDistributable(): bool
-    {
-        return $this->amount >= 2000;
-    }
-
-    /**
-     * If the amount is not distributable, this function will get called
-     * It will find an user with the loan amount and return it
-     * @return void
-     */
-    protected function distributeALesserAmount(): void
-    {
-        info('Inside the Lesser Amount function');
-        $amount = $this->amount;
-
-        $loan_preference = LoanPreference::where('maximum_distributed_amount', $amount)->first();
-
-        if ($loan_preference === null) {
-            $this->handleNotFound();
-        }
-
-        $user = User::has('transactions')
-            ->inRandomOrder()
-            ->where('role', 'lender')
-            ->where('balance', '>=', $amount)
-            ->whereHas('util', function ($q) {
-//                $q->where('loan_limit', '<=', 5);
-                $q->whereRaw('loan_limit= (select min(`loan_limit`) from utils)');
-            })
-            ->where('verified', 'verified')
-            ->first();
-
-        if ($user === null) {
-            $this->handleNotFound();
-        }
-
-        info("##################################################");
-        info('Distribution Successful');
-        info("##################################################");
-
-        # Saving the data to the database
-        $current_loan = Loan::where('unique_loan_id', $this->unique_loan_id)
-            ->first();
-
-        if (!$current_loan) {
-            $this->handleNotFound();
-        }
-
-        // attaching the loan to the borrower
-        $this->the_borrower->loans()->attach($current_loan, ['amount' => $this->amount]);
-
-        # attaching the loan to the lender
-        $user->loans()->attach($current_loan, ['amount' => $this->amount]);
-
-        $this->incrementLoanLimit($user->id);
-
-        $this->decrementLenderBalance($user->id, $amount);
-
-//        $the_borrower = $current_loan->users()
-//            ->where('role', 'borrower')
-//            ->first();
-
-        $this->incrementBorrowerBalance($this->the_borrower->id, $amount);
-
-        $current_loan->update([
-            'lender_data' => new LenderData(
-                $user->id,
-                $this->amount,
-            ),
-        ]);
-    }
-
-    /**
-     * If laravel can't find a user , this function gets called
-     * @return JsonResponse
-     */
-    protected function handleNotFound(): JsonResponse
-    {
-        $current_loan = Loan::where('unique_loan_id', $this->unique_loan_id)
-            ->first();
-
-        $this->the_borrower->loans()
-            ->attach($current_loan, ['amount' => $this->amount]);
-
-        $current_loan->update([
-            'loan_mode' => 'failed',
-        ]);
-
-        return response()->json([
-            'error' => 'Null User Found',
-        ], 500);
-    }
-
-    /**
-     * incrementing loan limit
-     * @param $id
-     * @return int
-     */
-    protected function incrementLoanLimit($id): int
-    {
-        return DB::table('utils')
-            ->where('user_id', $id)
-            ->increment('loan_limit');
-    }
-
-    protected function decrementLenderBalance($id, $amount): void
-    {
-        DB::table('users')
-            ->where('id', $id)
-            ->decrement('balance', $amount);
-    }
-
-    protected function incrementBorrowerBalance($id, $amount): void
-    {
-        DB::table('users')
-            ->where('id', $id)
-            ->increment('balance', $amount);
     }
 
     /**
@@ -349,6 +245,27 @@ class LoanDistributor implements ShouldQueue
         return $user;
     }
 
+    /**
+     * If laravel can't find a user , this function gets called
+     * @return JsonResponse
+     */
+    protected function handleNotFound(): JsonResponse
+    {
+        $current_loan = Loan::where('unique_loan_id', $this->unique_loan_id)
+            ->first();
+
+        $this->the_borrower->loans()
+            ->attach($current_loan, ['amount' => $this->amount]);
+
+        $current_loan->update([
+            'loan_mode' => 'failed',
+        ]);
+
+        return response()->json([
+            'error' => 'Null User Found',
+        ], 500);
+    }
+
     protected function checkIfLenderAmountsAreEqualToTheOriginalAmount(): bool
     {
         $total_amount = 0;
@@ -368,5 +285,140 @@ class LoanDistributor implements ShouldQueue
         }
 
         return true;
+    }
+
+    /**
+     * incrementing loan limit
+     * @param $id
+     * @return int
+     */
+    protected function incrementLoanLimit($id): int
+    {
+        return DB::table('utils')
+            ->where('user_id', $id)
+            ->increment('loan_limit');
+    }
+
+    protected function decrementLenderBalance($id, $amount): void
+    {
+        DB::table('users')
+            ->where('id', $id)
+            ->decrement('balance', $amount);
+    }
+
+    protected function createInstallmentForOneUser($user, $current_loan, $installment_amount): void
+    {
+        for ($i = 1; $i <= $current_loan->loan_duration; $i++) {
+            $due_date = today()->addMonths($i);
+            $user->installments()->create([
+                'amount' => $installment_amount,
+                'status' => 'unpaid',
+                'unique_installment_id' => uniqid('', true),
+                'loan_id' => $current_loan->id,
+                'penalty_amount' => 0,
+                'total_amount' => $installment_amount,
+                'due_date' => $due_date,
+                'installment_no' => $i,
+            ]);
+        }
+    }
+
+    protected function incrementBorrowerBalance($id, $amount): void
+    {
+        DB::table('users')
+            ->where('id', $id)
+            ->increment('balance', $amount);
+    }
+
+    /**
+     * This function checks whether the amount is distributable or not
+     * @return bool
+     */
+    protected function isDistributable(): bool
+    {
+        return $this->amount >= 2000;
+    }
+
+    /**
+     * If the amount is not distributable, this function will get called
+     * It will find an user with the loan amount and return it
+     * @return void
+     */
+    protected function distributeALesserAmount(): void
+    {
+        info('Inside the Lesser Amount function');
+        $amount = $this->amount;
+
+        $loan_preference = LoanPreference::where('maximum_distributed_amount', $amount)
+            ->first();
+
+        if ($loan_preference === null) {
+            $this->handleNotFound();
+        }
+
+        $user = User::has('transactions')
+            ->inRandomOrder()
+            ->where('role', 'lender')
+            ->where('balance', '>=', $amount)
+            ->whereHas('util', function ($q) {
+                $q->whereRaw('loan_limit= (select min(`loan_limit`) from utils)');
+            })
+            ->where('verified', 'verified')
+            ->first();
+
+        if ($user === null) {
+            $this->handleNotFound();
+        }
+
+        info("##################################################");
+        info('Distribution Successful');
+        info("##################################################");
+
+        # Saving the data to the database
+        $current_loan = Loan::where('unique_loan_id', $this->unique_loan_id)
+            ->first();
+
+        if (!$current_loan) {
+            $this->handleNotFound();
+        }
+
+        // attaching the loan to the borrower
+        $this->the_borrower->loans()->attach($current_loan, ['amount' => $this->amount]);
+
+        # attaching the loan to the lender
+        $user->loans()->attach($current_loan, ['amount' => $this->amount]);
+
+        $this->incrementLoanLimit($user->id);
+
+        $this->decrementLenderBalance($user->id, $amount);
+
+        $lender_installment_amount = $amount / $current_loan->loan_duration;
+
+        $this->createInstallmentForOneUser(
+            $user,
+            $current_loan,
+            $lender_installment_amount,
+        );
+
+//        $the_borrower = $current_loan->users()
+//            ->where('role', 'borrower')
+//            ->first();
+
+        $this->incrementBorrowerBalance($this->the_borrower->id, $amount);
+
+        $current_loan->update([
+            'lender_data' => new LenderData(
+                $user->id,
+                $this->amount,
+            ),
+        ]);
+
+        $borrower_installment_amount = $current_loan->monthly_installment_with_company_fees;
+
+        $this->createInstallmentForOneUser(
+            $this->the_borrower,
+            $current_loan,
+            $borrower_installment_amount,
+        );
     }
 }

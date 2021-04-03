@@ -49,4 +49,13 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
 
     // Get Single Loan Details
     Route::get('/get-single-loan/{id}', [AdminController::class, 'getSingleLoan']);
+
+    // Get All Installments
+    Route::get('/installments/{status}', [AdminController::class, 'getAllInstallments']);
+
+    // Get Penalty Data
+    Route::get('/get-penalty-data', [AdminController::class, 'getPenaltyData']);
+
+    // Update Penalty Data
+    Route::post('/update-penalty-data',[AdminController::class, 'updatePenaltyData']);
 });

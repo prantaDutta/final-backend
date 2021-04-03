@@ -114,6 +114,11 @@ class SpecialSeeder extends Seeder
         foreach ($users as $user) {
             $createdUser = User::create($user);
             for ($i = 0; $i < 5; $i++) {
+                if ($createdUser->id === 1
+                    || $createdUser->id === 2
+                    /* || $createdUser->id === 3 */) {
+                    continue;
+                }
                 $created_loan = Loan::create([
                     'loan_amount' => $loan_amount,
                     'lender_data' => $generate_lender_array->generate($loan_amount),
@@ -126,8 +131,8 @@ class SpecialSeeder extends Seeder
                     'amount_with_interest_and_company_fees' => $loan_amount + $interest + $company_fees,
                     'monthly_installment' => ($loan_amount + $interest) / $loan_duration,
                     'monthly_installment_with_company_fees' => ($loan_amount + $interest + $company_fees) / $loan_duration,
-                    'loan_start_date' => $loan_start_date,
-                    'loan_end_date' => $loan_start_date->addMonths($loan_duration),
+//                    'loan_start_date' => Carbon::today()->subDays(random_int(0, 365)),
+//                    'loan_end_date' => Carbon::today()->addMonths(random_int(3, 18)),
                 ]);
 
                 $createdUser->loans()->attach($created_loan, ['amount' => 500]);
@@ -143,6 +148,41 @@ class SpecialSeeder extends Seeder
                     'transaction_type' => random_int(0, 1) === 0 ? "deposit" : "withdraw",
                     'currency' => "BDT",
                 ]);
+
+                $rand = random_int(0, 2);
+                $penalty_arr = [10, 20, 30, 40];
+                $status = 'unpaid';
+                if ($rand === 0) {
+                    $status = 'paid';
+                }
+                if ($rand === 1) {
+                    $status = 'due';
+                }
+                # This will give us all the ids of loan table
+                $loan_ids = Loan::where('id', '>', 0)
+                    ->pluck('id');
+                $len = count($loan_ids);
+                if ($len > 1) {
+                    $len = 1;
+                }
+//                $pos = array_search($createdUser->loans->id, (array)$loan_ids, true);
+//                unset($loan_ids[$pos]);
+                $penalty = $rand === 0 ? 0 : $penalty_arr[random_int(0, 3)];
+
+                $due_date = $rand === 0
+                    ? now()->subMonths(random_int(0, 5))
+                    : now()->addMonths(random_int(0, 5));
+
+                $createdUser->installments()->create([
+                    'amount' => 500,
+                    'status' => $status,
+                    'unique_installment_id' => uniqid('', true),
+                    'loan_id' => $loan_ids[random_int(1, $len)] ?? 1,
+                    'penalty_amount' => $penalty,
+                    'total_amount' => 500 + $penalty,
+                    'due_date' => $due_date,
+                    'installment_no' => random_int(1, 5),
+                ]);
             }
             $rand = random_int(0, 1);
             $createdUser->verification()->create([
@@ -156,13 +196,19 @@ class SpecialSeeder extends Seeder
                 'verification_photos' => '{"recentPhoto": "upload_44eda4489b5ceab3cf879117c19785a5.jpg", "addressProof": "upload_6463f29a4f564fd48330f235025919d1.jpg", "nidOrPassport": "upload_4da218498b851729d184d2256eea1ca6.jpg", "bankAccountStatements": "upload_d0b598be4d344630a300fcf09d8c77cb.jpg#upload_f68d7ca36095339e620b3249ab479bec.jpg#upload_e3aba93cb22fb7885ca15572ce88c3e8.jpg#"}',
             ]);
             $amounts = [500, 1000, 1500, 2000, 2500, 3000];
+
             $createdUser->loan_preference()->create([
                 'maximum_distributed_amount' => $amounts[random_int(0, count($amounts) - 1)],
             ]);
+
             $createdUser->util()->create([
                 'loan_limit' => 0,
             ]);
         }
-    }
 
+        $admin = User::find(1);
+        $admin->administration()->create([
+            'penalty_data' => config('constants.penalty_data'),
+        ]);
+    }
 }

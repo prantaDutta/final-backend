@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|LoanPreference whereMaximumDepositedAmount($value)
  * @property int|null $maximum_distributed_amount
  * @method static \Illuminate\Database\Eloquent\Builder|LoanPreference whereMaximumDistributedAmount($value)
+ * @method static \Database\Factories\LoanPreferenceFactory factory(...$parameters)
  */
 class LoanPreference extends Model
 {

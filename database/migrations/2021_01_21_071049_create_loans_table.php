@@ -18,16 +18,18 @@ class CreateLoansTable extends Migration
             $table->decimal('loan_amount');
             $table->string('unique_loan_id');
             $table->json('lender_data')->nullable();
-            $table->enum('loan_mode', ['processing', 'ongoing', 'finished', 'failed']);
+            $table->enum('loan_mode',
+                ['processing', 'ongoing', 'finished', 'failed']);
             $table->integer('loan_duration');
             $table->integer('interest_rate');
-            $table->decimal('amount_with_interest');
-            $table->decimal('company_fees');
-            $table->decimal('amount_with_interest_and_company_fees');
-            $table->decimal('monthly_installment');
-            $table->decimal('monthly_installment_with_company_fees');
-            $table->timestamp('loan_start_date')->nullable();
-            $table->timestamp('loan_end_date')->nullable();
+            $table->decimal('amount_with_interest',12);
+            $table->decimal('company_fees',12);
+            $table->decimal('amount_with_interest_and_company_fees',12);
+            $table->decimal('monthly_installment',12);
+            $table->decimal('monthly_installment_with_company_fees',12);
+//            $table->integer('total_installment');
+//            $table->timestamp('loan_start_date');
+//            $table->timestamp('loan_end_date');
             $table->timestamps();
         });
     }
