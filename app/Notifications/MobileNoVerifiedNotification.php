@@ -3,12 +3,13 @@
 namespace App\Notifications;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewLoanRequested extends Notification implements ShouldQueue
+class MobileNoVerifiedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -41,30 +42,19 @@ class NewLoanRequested extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        $user = User::where('email', $notifiable->email)->first();
-        $loans = $user->loans()->latest()->first();
         return (new MailMessage)
-            ->subject('New Loan Requested')
+            ->subject('Mobile No. Verified')
             ->greeting('Hello ' . $notifiable->name)
-            ->line('GrayScale is one of the fastest growing peer to peer (P2P) lending
-            platforms in Bangladesh. It connects investors or lenders looking
-            for high returns with creditworthy borrowers looking for short term
-            personal loans.')
-            ->line('We Received new Loan Request For You with following details')
-            ->line('The Loan Amount: ' . $loans->loan_amount . 'Tk.')
-            ->line('The Loan Duration: ' . $loans->loan_duration . 'Months')
-            ->line('The Interest Rate: ' . $loans->interest_rate . '%')
-            ->line('You have to pay ' . $loans->monthly_installment_with_company_fees . 'Tk. every Months')
-            ->action('Go to Loans', url(config('app.frontEndUrl')) . '/loans')
-            ->line('Thank You, ')
-            ->line('Grayscale');
+            ->line('Your Mobile No. is successfully verified')
+            ->line('Thank You For Your Co-operation')
+            ->action('Go to Homepage', url('/'));
     }
 
     # Saving data to the database
     public function toDatabase($notifiable)
     {
         return [
-            'msg' => 'You Requested a new Loan'
+            'msg' => 'Your Mobile No is Successfully Verified'
         ];
     }
 

@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class VerifyMobileNo extends Notification implements ShouldQueue
+class VerifyMobileNoNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 

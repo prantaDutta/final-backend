@@ -6,7 +6,7 @@ use App\Events\NewLoanRequestEvent;
 use App\Http\Resources\LoanResource;
 use App\Models\Loan;
 use App\Models\User;
-use App\Notifications\NewLoanRequested;
+use App\Notifications\NewLoanRequestedNotification;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
@@ -50,7 +50,7 @@ class LoanController extends Controller
             'monthly_installment_with_company_fees' => $values['modifiedMonthlyInstallment']
         ]);
 
-        $user->notify(new NewLoanRequested);
+        $user->notify(new NewLoanRequestedNotification);
 
         # This event is not really necessary at least for now
         # But it boosts performance

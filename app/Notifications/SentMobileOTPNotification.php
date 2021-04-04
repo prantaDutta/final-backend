@@ -11,7 +11,7 @@ use Illuminate\Notifications\Messages\NexmoMessage;
 use Illuminate\Notifications\Notification;
 use JetBrains\PhpStorm\ArrayShape;
 
-class SendMobileOTP extends Notification implements ShouldQueue
+class SentMobileOTPNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 

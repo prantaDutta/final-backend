@@ -83,6 +83,9 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     // Get All Notifications
     Route::get('/get-all-notifications', [UserController::class, 'getAllNotifications']);
 
+    // Mark First Three as Notified
+    Route::post('/mark-three-as-notified', [UserController::class, 'markThreeAsNotified']);
+
     // Delete a Notification
     Route::post('/delete-single-notification/{id}', [UserController::class, 'deleteNotification']);
 

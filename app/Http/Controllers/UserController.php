@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\LoanPreferenceResource;
 use App\Http\Resources\LoanResource;
 use App\Http\Resources\NotificationResource;
 use App\Http\Resources\TransactionResource;
@@ -10,12 +9,13 @@ use App\Http\Resources\UserResource;
 use App\Http\Resources\VerificationResource;
 use App\Models\User;
 use App\Models\Util;
-use App\Notifications\EmailVerified;
-use App\Notifications\MobileNoVerified;
-use App\Notifications\SendMobileOTP;
-use App\Notifications\SendVerifyEmailOTP;
+use App\Notifications\EmailVerifiedNotification;
+use App\Notifications\MobileNoVerifiedNotification;
+use App\Notifications\SentMobileOTPNotification;
+use App\Notifications\SentVerifyEmailOTPNotification;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -76,7 +76,7 @@ class UserController extends Controller
             'email_verify_otp' => $otp
         ]);
         Notification::route('mail', [$email => $user->name])
-            ->notify(new SendVerifyEmailOTP($user->name, $email, $otp, $uniq_id));
+            ->notify(new SentVerifyEmailOTPNotification($user->name, $email, $otp, $uniq_id));
         return response()->json(["OK"], 200);
     }
 
@@ -89,7 +89,7 @@ class UserController extends Controller
         $user->save();
         if ($util && ($util->updated_at->diffInMinutes() <= 15)) {
             $user = User::find($util->user_id);
-            $user->notify(new EmailVerified());
+            $user->notify(new EmailVerifiedNotification());
             $url = config('app.frontEndUrl');
             return Redirect::to($url);
         }
@@ -110,7 +110,7 @@ class UserController extends Controller
             $user = User::find($util->user_id);
             $user->email_verified_at = Carbon::now();
             $user->save();
-            $user->notify(new EmailVerified());
+            $user->notify(new EmailVerifiedNotification());
             return response()->json(["Ok"], 200);
         }
         return abort(404);
@@ -129,7 +129,7 @@ class UserController extends Controller
             // uncomment this lines to send messages
 //            $util = new UtilController();
 //            $util->sendSMS('880' . $mobile_no, 'Your OTP is ' . $otp);
-            $user->notify(new SendMobileOTP());
+            $user->notify(new SentMobileOTPNotification());
             return response()->json(["OK"], 200);
         } catch (Exception $e) {
             return $e;
@@ -145,7 +145,7 @@ class UserController extends Controller
         $user->mobile_no_verified_at = Carbon::now();
         $user->save();
         if ($util && ($util->updated_at->diffInMinutes() <= 15)) {
-            $user->notify(new MobileNoVerified());
+            $user->notify(new MobileNoVerifiedNotification());
             return response()->json(["Ok"], 200);
         }
         return abort(404);
@@ -285,7 +285,7 @@ class UserController extends Controller
     }
 
     // update account Settings
-    public function updateAccountSettings(Request $request, $info)
+    public function updateAccountSettings(Request $request, $info): JsonResponse
     {
         $user = User::find($request->user()->id);
         if ($info === 'language') {
@@ -322,12 +322,13 @@ class UserController extends Controller
     }
 
     // Get dashboard Notifications
-    public function getNotifications(Request $request)
+    public function getNotifications(Request $request): JsonResponse
     {
-        $user = User::find($request->user()->id);
-        $notifications = $user->notifications()
+        $user = User::findOrFail($request->user()->id);
+        $notifications = $user->unreadNotifications()
             ->orderBy('updated_at')
             ->skip(0)->take(3)->get();
+
         return response()->json([
             'notifications' => NotificationResource::collection($notifications),
             'count' => $user->unreadNotifications()->count()
@@ -335,7 +336,7 @@ class UserController extends Controller
     }
 
     // Get All Notifications
-    public function getAllNotifications(Request $request)
+    public function getAllNotifications(Request $request): JsonResponse
     {
         $user = User::find($request->user()->id);
         $notifications = $user->notifications()
@@ -344,6 +345,19 @@ class UserController extends Controller
         return response()->json([
             'notifications' => NotificationResource::collection($notifications),
         ]);
+    }
+
+    // Mark First Three Notifications as Notified
+    public function markThreeAsNotified(Request $request): JsonResponse
+    {
+        $ids = $request->get('notificationIds');
+        $user = User::findOrFail($request->user()->id);
+
+        foreach ($ids as $id) {
+            $user->notifications->where('id', $id)->markAsRead();
+        }
+
+        return response()->json(["OK"]);
     }
 
     // Delete Notification

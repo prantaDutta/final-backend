@@ -8,7 +8,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use JetBrains\PhpStorm\ArrayShape;
 
-class WelcomeMessage extends Notification implements ShouldQueue
+class WelcomeMessageNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
