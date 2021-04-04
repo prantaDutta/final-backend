@@ -16,7 +16,7 @@ class UserObserver
      * @param User $user
      * @return void
      */
-    public function created(User $user)
+    public function created(User $user): void
     {
 //        $uniq_id = uniqid('', true);
 //        $otp = mt_rand(100000, 999999);

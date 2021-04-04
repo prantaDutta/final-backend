@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Events\NewLoanRequestEvent;
 use App\Listeners\DistributeNewLoanListener;
-use App\Listeners\NewLoanRequestAcceptedNotificationListener;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Observers\TransactionObserver;
