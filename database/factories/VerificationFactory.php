@@ -31,7 +31,7 @@ class VerificationFactory extends Factory
             'division' => 'chattogram',
             'zila' => 'chattogram',
             'zip_code' => '4000',
-            'verification_photos' => '{"recentPhoto": "upload_44eda4489b5ceab3cf879117c19785a5.jpg", "addressProof": "upload_6463f29a4f564fd48330f235025919d1.jpg", "nidOrPassport": "upload_4da218498b851729d184d2256eea1ca6.jpg", "bankAccountStatements": "upload_d0b598be4d344630a300fcf09d8c77cb.jpg#upload_f68d7ca36095339e620b3249ab479bec.jpg#upload_e3aba93cb22fb7885ca15572ce88c3e8.jpg#"}',
+            'verification_photos' => '{"recentPhoto": "upload_f09dc1ea9938e0f078bf34500df6645a.jpg", "addressProof": "upload_eab542cb683d754026f125db68870ca3.png", "businessProof": "upload_3eadf6690c04522340172b15efbc9e73.png", "nidOrPassport": "upload_a65039e0876521f5eb1f1b5036478e4c.jpg", "bankAccountStatements": "upload_b35667317d98ff06951979ce55014a68.jpg#upload_976a3309f876ebbe87b61e3f5fad7f16.jpg#upload_d8856687bc2b2256811dc42bded3153a.jpg#"}',
         ];
     }
 }
