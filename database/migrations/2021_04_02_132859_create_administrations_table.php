@@ -20,6 +20,7 @@ class CreateAdministrationsTable extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
             $table->json('penalty_data')->nullable();
+            $table->integer('default_interest_rate')->nullable();
             $table->timestamps();
         });
     }

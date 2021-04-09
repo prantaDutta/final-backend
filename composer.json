@@ -19,7 +19,8 @@
         "laravel/sanctum": "^2.8",
         "laravel/tinker": "^2.5",
         "nexmo/client": "^2.4",
-        "nexmo/laravel": "^2.4"
+        "nexmo/laravel": "^2.4",
+        "spatie/laravel-backup": "^7.3"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",

@@ -25,6 +25,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|Administration whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Administration whereUserId($value)
  * @mixin \Eloquent
+ * @property int|null $default_interest_rate
+ * @method static \Illuminate\Database\Eloquent\Builder|Administration whereDefaultInterestRate($value)
  */
 class Administration extends Model
 {

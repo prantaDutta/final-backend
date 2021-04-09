@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,6 +17,8 @@ class TransactionResource extends JsonResource
     public function toArray($request)
     {
 //        return parent::toArray($request);
+        $created_at = Carbon::parse($this->created_at);
+        $created_at = $created_at->format('d M,Y h:i A');
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -27,7 +30,7 @@ class TransactionResource extends JsonResource
             'transactionId' => $this->transaction_id,
             'transactionType' => $this->transaction_type,
             'currency' => $this->currency,
-            'createdAt' => $this->created_at
+            'createdAt' => $created_at,
         ];
     }
 }

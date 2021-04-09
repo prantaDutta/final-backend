@@ -23,29 +23,32 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     // get all verification requests
     Route::get('/users/{verified}', [AdminController::class, 'getUsers']);
 
-    // get single verification requests
+    // get single user requests
     Route::get('/user/{id}', [AdminController::class, 'getSingleUser']);
 
+    // get all loan installments from an id
+    Route::get('/user/loan-installments/{id}', [AdminController::class, 'getLoanInstallments']);
+
+    // get all loans, transactions, installments for a user
+    Route::get('/user/{type}/{id}', [AdminController::class, 'getThingsForOneUser']);
+
     // make an account verified
-    Route::get('/user/{ifVerified}/{id}', [AdminController::class, 'makeAccountVerified']);
+    Route::get('/verification-check/{ifVerified}/{id}', [AdminController::class, 'makeAccountVerified']);
 
     // get all Loan Requests
     Route::get('/loans/{requestType}', [AdminController::class, 'getAllLoans']);
 
-    // Fetching Admin Dashboard Data
-//    Route::get('/recent-data',[AdminController::class,'recentData']);
-
     // Fetching Alternate Dashboard Data
-    Route::get('/dashboard-data',[AdminController::class,'dashboardData']);
+    Route::get('/dashboard-data', [AdminController::class, 'dashboardData']);
 
     // Getting All Transactions
-    Route::get('/transactions/{type}/{status}',[AdminController::class,'getTransactions']);
+    Route::get('/transactions/{type}/{status}', [AdminController::class, 'getTransactions']);
 
     // Get Single Transaction Requests
-    Route::get('/transaction/{id}',[AdminController::class,'getSingleTransactions']);
+    Route::get('/transaction/{id}', [AdminController::class, 'getSingleTransactions']);
 
     // Transaction Successful Or Failed
-    Route::get('/transaction/{type}/{id}',[AdminController::class, 'markTransaction']);
+    Route::get('/transaction/{type}/{id}', [AdminController::class, 'markTransaction']);
 
     // Get Single Loan Details
     Route::get('/get-single-loan/{id}', [AdminController::class, 'getSingleLoan']);
@@ -57,5 +60,11 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     Route::get('/get-penalty-data', [AdminController::class, 'getPenaltyData']);
 
     // Update Penalty Data
-    Route::post('/update-penalty-data',[AdminController::class, 'updatePenaltyData']);
+    Route::post('/update-penalty-data', [AdminController::class, 'updatePenaltyData']);
+
+    // get default interest rate
+    Route::get('/get-interest-rate', [AdminController::class, 'getInterestRate']);
+
+    // update default interest rate
+    Route::post('/update-interest-rate', [AdminController::class, 'updateInterestRate']);
 });

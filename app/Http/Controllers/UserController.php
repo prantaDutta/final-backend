@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\LoanResource;
+use App\Http\Resources\LoanPreferenceResource;
 use App\Http\Resources\NotificationResource;
-use App\Http\Resources\TransactionResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\VerificationResource;
+use App\Models\Installment;
 use App\Models\User;
 use App\Models\Util;
 use App\Notifications\EmailVerifiedNotification;
@@ -15,75 +15,94 @@ use App\Notifications\SentMobileOTPNotification;
 use App\Notifications\SentVerifyEmailOTPNotification;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Notification;
 use Redirect;
 
+/**
+ * Class UserController
+ * @package App\Http\Controllers
+ */
 class UserController extends Controller
 {
-    // redirecting to login
-    public function login()
+    /**
+     * redirecting to login
+     * @return RedirectResponse
+     */
+    public function login(): RedirectResponse
     {
         $url = config('app.frontEndUrl');
         return Redirect::to($url . '/login');
     }
 
-    // checks for unique Email
-    public function uniqueEmail(Request $request)
+    /**
+     * checks for unique Email
+     * @param Request $request
+     * @return Application|ResponseFactory|JsonResponse|Response
+     */
+    public function uniqueEmail(Request $request): Response|JsonResponse|Application|ResponseFactory
     {
         $user = User::where('email', $request->get('email'))->first();
         if (!$user) {
-            return abort(422);
+            return $this->error(422, "Wrong Credentials");
         }
-        return response('OK', 200);
+        return response('OK');
     }
 
-    // Sending Email
-//    public function sendEmail(Request $request)
-//    {
-//
-//        $actions = new EmailActionButton('Verify', '/api/user/verify-email');
-//        $utility = new UtilController();
-//        $utility->sendAnEmail(
-//            $request->get('email'),
-//            "Verify Your Email",
-//            "Please Click the button to verify your email",
-//            "Verify Email",
-//            $actions
-//        );
-//
-//        return response()->json(["OK"], 200);
-//    }
-
-    // get current user's mobile no
-    public function getMobileNo(Request $request)
+    /**
+     * This function returns an error as JSON Response
+     * I used this function through out this controller
+     * @param int $code
+     * @param string $msg
+     * @return JsonResponse
+     */
+    protected function error($code = 500, $msg = "ERROR"): JsonResponse
     {
-        return $request->user()->verification->mobile_no;
+        return response()->json(["ERROR" => $msg], $code);
     }
 
-    // Sending Email
-    public function sendVerifyEmail(Request $request)
+    /**
+     * Sends Verification Email with otp
+     * @param Request $request
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function sendVerifyEmail(Request $request): JsonResponse
     {
         $email = $request->get('email');
         $user = $request->user();
         $uniq_id = uniqid('', true);
-        $otp = mt_rand(100000, 999999);
+        $otp = random_int(100000, 999999);
         $user->util()->update([
             'email_verify_token' => $uniq_id,
             'email_verify_otp' => $otp
         ]);
-        Notification::route('mail', [$email => $user->name])
-            ->notify(new SentVerifyEmailOTPNotification($user->name, $email, $otp, $uniq_id));
-        return response()->json(["OK"], 200);
+
+//        Notification::route('mail', [$email => $user->name])
+        $user->notify(new SentVerifyEmailOTPNotification($user->name, $email, $otp, $uniq_id));
+        return response()->json(["OK"]);
     }
 
-    // Verifying the email
-    public function verifyEmail($email, $token)
+    /**
+     * Verifies Email through the link And Notifies The User
+     * @param $email
+     * @param $token
+     * @return RedirectResponse|JsonResponse
+     */
+    public function verifyEmail($email, $token): RedirectResponse|JsonResponse
     {
         $util = Util::where('email_verify_token', $token)->first();
+
+        if ($util === null) {
+            return $this->error();
+        }
+
         $user = User::find($util->user_id);
         $user->email = $email;
         $user->save();
@@ -93,66 +112,103 @@ class UserController extends Controller
             $url = config('app.frontEndUrl');
             return Redirect::to($url);
         }
-        return abort(404);
+        return $this->error(422, "Email Not Verified");
     }
 
-    //verify email with otp
-    public function verifyEmailOtp(Request $request)
+    /**
+     * Verifies Email through otp and notifies the user
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function verifyEmailOtp(Request $request): JsonResponse
     {
         $otp = $request->get('otp');
         $email = $request->get('email');
         $util = Util::where('email_verify_otp', $otp)->first();
+
+        if ($util === null) {
+            return $this->error();
+        }
+
         $user = User::find($util->user_id);
         $user->email = $email;
         $user->save();
-//        if ($util && ($util->updated_at->diffInMinutes() <= 15)) {
-        if ($util) {
+        if ($util && ($util->updated_at->diffInMinutes() <= 15)) {
             $user = User::find($util->user_id);
             $user->email_verified_at = Carbon::now();
             $user->save();
             $user->notify(new EmailVerifiedNotification());
-            return response()->json(["Ok"], 200);
+            return response()->json(["Ok"]);
         }
-        return abort(404);
+        return $this->error();
     }
 
-    // Sending OTP to mobile no
-    public function sendMobileOTP(Request $request)
+    /**
+     * Send an sms to the user
+     * @param Request $request
+     * @return Exception|JsonResponse
+     * @throws Exception
+     */
+    public function sendMobileOTP(Request $request): JsonResponse|Exception
     {
         $mobile_no = $request->get('mobileNo');
         $user = $request->user();
 
-        $user->mobile_no = 880 . $mobile_no;
-        $user->save();
+        $otp = random_int(100000, 999999);
+        $user->util()->updateOrCreate(
+            [
+                'user_id' => $user->id,
+            ],
+            [
+                'mobile_no_verify_otp' => $otp,
+            ]
+        );
+
+        $user->update([
+            'mobile_no' => 880 . $mobile_no,
+        ]);
 
         try {
             // uncomment this lines to send messages
 //            $util = new UtilController();
 //            $util->sendSMS('880' . $mobile_no, 'Your OTP is ' . $otp);
-            $user->notify(new SentMobileOTPNotification());
-            return response()->json(["OK"], 200);
-        } catch (Exception $e) {
-            return $e;
+            $user->notify(new SentMobileOTPNotification($otp));
+            return response()->json(["OK"]);
+        } catch (Exception) {
+            return $this->error(500, "Error Sending SMS");
         }
     }
 
-    // Verifying Mobile No
-    public function verifyMobileNo(Request $request)
+    /**
+     * Verify Mobile No
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function verifyMobileNo(Request $request): JsonResponse
     {
         $otp = $request->get('otp');
         $util = Util::where('mobile_no_verify_otp', $otp)->first();
+
+        if ($util === null) {
+            return $this->error();
+        }
+
         $user = User::find($util->user_id);
         $user->mobile_no_verified_at = Carbon::now();
         $user->save();
         if ($util && ($util->updated_at->diffInMinutes() <= 15)) {
             $user->notify(new MobileNoVerifiedNotification());
-            return response()->json(["Ok"], 200);
+            return response()->json(["Ok"]);
         }
-        return abort(404);
+        return $this->error(404, "Otp Didn't Match");
     }
 
-    // Is Contact Verified
-    public function isContactVerified(Request $request)
+    /**
+     * checking whether email and mobile no are verified
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function isContactVerified(Request $request): JsonResponse
     {
         $user = $request->user();
         $email_verified = false;
@@ -166,21 +222,31 @@ class UserController extends Controller
         return response()->json([
             'email' => $email_verified,
             'mobileNo' => $mobile_no_verified,
-        ], 200);
+        ]);
     }
 
-    // checks for unique Email excluding id
-    public function uniqueEmailExcludingId(Request $request)
+    /**
+     * Checks unique email without current user id
+     * @param Request $request
+     * @return Application|ResponseFactory|Response
+     */
+    public function uniqueEmailExcludingId(Request $request): Response|Application|ResponseFactory
     {
         $user = User::where('email', $request->get('email'))->first();
         if ($user && $user->id !== $request->get('id')) {
             return response('ERROR', 422);
         }
-        return response('OK', 200);
+        return response('OK');
     }
 
-    // getting the current user with verification data
-    public function userWithVerificationData(Request $request)
+    // Fetching recent data
+
+    /**
+     * Self explanatory
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function userWithVerificationData(Request $request): JsonResponse
     {
         $user = $request->user();
         return response()->json([
@@ -189,23 +255,19 @@ class UserController extends Controller
         ]);
     }
 
-    // Fetching recent data
-    public function recentData(Request $request)
+    /**
+     * fetches the dashboard data
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function dashboardData(Request $request): JsonResponse
     {
-        // Get First Two Rows
-        $loans = $request->user()->loans->skip(0)->take(2);
-        $transactions = $request->user()->transactions->skip(0)->take(2);
-        return response()->json([
-            'loans' => LoanResource::collection($loans),
-            'transactions' => TransactionResource::collection($transactions)
-        ]);
-    }
-
-    // fetching Alternate Dashboard Data
-    public function dashboardData(Request $request)
-    {
-        $loans = $request->user()->loans;
-        $transactions = $request->user()->transactions;
+        $user = $request->user();
+        $loans = $user->loans;
+        $transactions = $user->transactions;
+        $installments = Installment::where('user_id', $user->id)
+            ->where('status', 'due')
+            ->get();
 
         $ongoingLoans = $loans->where('loan_mode', 'ongoing')->count();
         $processingLoans = $loans->where('loan_mode', 'processing')->count();
@@ -213,17 +275,24 @@ class UserController extends Controller
 
         $deposits = $transactions->where('transaction_type', 'deposit')->count();
         $withdrawals = $transactions->where('transaction_type', 'withdraw')->count();
+
         return response()->json([
             'ongoing' => $ongoingLoans,
             'processing' => $processingLoans,
             'finished' => $finishedLoans,
             'deposits' => $deposits,
-            'withdrawals' => $withdrawals
+            'withdrawals' => $withdrawals,
+            'dueInstallments' => count($installments),
         ]);
     }
 
-    // update Personal Settings
-    public function updatePersonalSettings(Request $request, $info)
+    /**
+     * update personal settings
+     * @param Request $request
+     * @param $info
+     * @return JsonResponse
+     */
+    public function updatePersonalSettings(Request $request, $info): JsonResponse
     {
         // Finding authenticated user
         $user = User::find($request->user()->id);
@@ -246,7 +315,7 @@ class UserController extends Controller
                 'zip_code' => $request->get('zipCode')
             ]);
 
-            return response()->json(["OK"], 200);
+            return response()->json(["OK"]);
         }
 
         // if mobile field is modified
@@ -261,7 +330,7 @@ class UserController extends Controller
                 'mobile_no' => $request->get('mobileNo'),
             ]);
 
-            return response()->json(["OK"], 200);
+            return response()->json(["OK"]);
         }
 
         // if email field is modified
@@ -279,12 +348,18 @@ class UserController extends Controller
                 'email' => $request->get('email'),
             ]);
 
-            return response()->json(["OK"], 200);
+            return response()->json(["OK"]);
         }
-        return abort(422);
+        return $this->error(422);
     }
 
-    // update account Settings
+
+    /**
+     * update account settings
+     * @param Request $request
+     * @param $info
+     * @return JsonResponse
+     */
     public function updateAccountSettings(Request $request, $info): JsonResponse
     {
         $user = User::find($request->user()->id);
@@ -292,13 +367,13 @@ class UserController extends Controller
             $user->update([
                 'language' => $request->get('language'),
             ]);
-            return response()->json(["OK"], 200);
+            return response()->json(["OK"]);
         }
         if ($info === 'close') {
             try {
                 $user->delete();
-                return response()->json(["OK"], 200);
-            } catch (Exception $e) {
+                return response()->json(["OK"]);
+            } catch (Exception) {
                 return response()->json(["Something Went Wrong"], 500);
             }
         }
@@ -314,14 +389,19 @@ class UserController extends Controller
                     'password' => Hash::make($request->get('newPassword'))
                 ]);
 
-                return response()->json(["Ok"], 200);
+                return response()->json(["Ok"]);
             }
         }
 
-        return abort(422);
+        return $this->error(422);
     }
 
-    // Get dashboard Notifications
+
+    /**
+     * Get the first 3 Notifications
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getNotifications(Request $request): JsonResponse
     {
         $user = User::findOrFail($request->user()->id);
@@ -335,7 +415,11 @@ class UserController extends Controller
         ]);
     }
 
-    // Get All Notifications
+    /**
+     * get all notifications
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getAllNotifications(Request $request): JsonResponse
     {
         $user = User::find($request->user()->id);
@@ -347,7 +431,11 @@ class UserController extends Controller
         ]);
     }
 
-    // Mark First Three Notifications as Notified
+    /**
+     *  Mark First Three Notifications as Notified
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function markThreeAsNotified(Request $request): JsonResponse
     {
         $ids = $request->get('notificationIds');
@@ -360,12 +448,6 @@ class UserController extends Controller
         return response()->json(["OK"]);
     }
 
-    // Delete Notification
-    public function deleteNotification(Request $request, $id)
-    {
-        return $request->user()->notifications()->where('id', $id)->delete();
-    }
-
 //    # Get Loan Preferences
 //    public function getLoanPreferences(Request $request)
 //    {
@@ -376,13 +458,46 @@ class UserController extends Controller
 //        ], 200);
 //    }
 //
-    # Saving Loan Preferences
-    public function saveLoanPreferences(Request $request)
+
+    /**
+     * Deletes a notification
+     * @param Request $request
+     * @param $id
+     * @return mixed
+     */
+    public function deleteNotification(Request $request, $id): mixed
+    {
+        return $request->user()->notifications()->where('id', $id)->delete();
+    }
+
+    /**
+     * Saving Loan Preferences
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function saveLoanPreferences(Request $request): JsonResponse
     {
         $user = $request->user();
+        $amount = $request->get('maximumDistributedAmount');
+        if ($amount === null) {
+            return $this->error();
+        }
         $user->loan_preference()->update([
-            'maximum_distributed_amount' => $request->get('maximumDistributedAmount'),
+            'maximum_distributed_amount' => $amount,
         ]);
-        return response()->json(["OK"], 200);
+        return response()->json(["OK"]);
+    }
+
+    /**
+     * Get Loan Preferences
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getLoanPreferences(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        return response()->json([
+            'loanPreference' => new LoanPreferenceResource($user->loan_preference),
+        ]);
     }
 }

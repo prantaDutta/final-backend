@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -15,9 +14,11 @@ class NewLoanRequestedNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      *
-     * @return void
+     * @param mixed $loans
      */
-    public function __construct()
+    public function __construct(
+        public mixed $loans
+    )
     {
         //
     }
@@ -41,8 +42,7 @@ class NewLoanRequestedNotification extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        $user = User::where('email', $notifiable->email)->first();
-        $loans = $user->loans()->latest()->first();
+        $loans = $this->loans;
         return (new MailMessage)
             ->subject('New Loan Requested')
             ->greeting('Hello ' . $notifiable->name)

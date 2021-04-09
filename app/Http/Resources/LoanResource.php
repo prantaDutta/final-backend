@@ -16,15 +16,14 @@ class LoanResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'uniqueLoanId' => $this->unique_loan_id,
             'id' => $this->id,
             'amount' => $this->loan_amount,
             'loanDuration' => $this->loan_duration,
-            'uniqueLoanId' => $this->unique_loan_id,
             'interestRate' => $this->interest_rate,
             'monthlyInstallment' => $this->monthly_installment_with_company_fees,
             'loanMode' => $this->loan_mode,
             'modifiedMonthlyInstallment' => $this->monthly_installment_with_company_fees,
-//            'users' => $this->users ? UserResource::collection($this->users) : null
         ];
     }
 }

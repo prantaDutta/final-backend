@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use JetBrains\PhpStorm\ArrayShape;
 
 class MobileNoVerifiedNotification extends Notification implements ShouldQueue
 {
@@ -26,10 +27,9 @@ class MobileNoVerifiedNotification extends Notification implements ShouldQueue
     /**
      * Get the notification's delivery channels.
      *
-     * @param mixed $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via(): array
     {
         return ['mail', 'database'];
     }
@@ -40,7 +40,7 @@ class MobileNoVerifiedNotification extends Notification implements ShouldQueue
      * @param mixed $notifiable
      * @return MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail(mixed $notifiable): MailMessage
     {
         return (new MailMessage)
             ->subject('Mobile No. Verified')
@@ -51,7 +51,7 @@ class MobileNoVerifiedNotification extends Notification implements ShouldQueue
     }
 
     # Saving data to the database
-    public function toDatabase($notifiable)
+    #[ArrayShape(['msg' => "string"])] public function toDatabase($notifiable): array
     {
         return [
             'msg' => 'Your Mobile No is Successfully Verified'
@@ -61,10 +61,9 @@ class MobileNoVerifiedNotification extends Notification implements ShouldQueue
     /**
      * Get the array representation of the notification.
      *
-     * @param mixed $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray(): array
     {
         return [
             //

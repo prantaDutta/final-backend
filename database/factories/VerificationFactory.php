@@ -31,7 +31,7 @@ class VerificationFactory extends Factory
             'division' => 'chattogram',
             'zila' => 'chattogram',
             'zip_code' => '4000',
-            'verification_photos' => '{"recentPhoto": "upload_f09dc1ea9938e0f078bf34500df6645a.jpg", "addressProof": "upload_eab542cb683d754026f125db68870ca3.png", "businessProof": "upload_3eadf6690c04522340172b15efbc9e73.png", "nidOrPassport": "upload_a65039e0876521f5eb1f1b5036478e4c.jpg", "bankAccountStatements": "upload_b35667317d98ff06951979ce55014a68.jpg#upload_976a3309f876ebbe87b61e3f5fad7f16.jpg#upload_d8856687bc2b2256811dc42bded3153a.jpg#"}',
+            'verification_photos' => '{"salarySlip": "upload_15b3fd02ee5aeec3b984ad66410628c2.png", "recentPhoto": "upload_392b7e08f32064d419f808684b7a4680.png", "addressProof": "upload_a6301c09c628e5648f8627abdc33d4cd.png", "nidOrPassport": "upload_3372b237e397bbc109b8cc264948fa0a.jpg", "employeeIdCard": "upload_7a23d62d88a8999177a8f460af63ab1e.png", "bankAccountStatements": "upload_907cb6f0e5418b267309231fc0b35672.jpg#upload_4ca1b4b40ce2b8fc540c9cba8747416b.jpg#upload_217692232c84340eb094390ff41aa6ab.jpg#"}',
         ];
     }
 }

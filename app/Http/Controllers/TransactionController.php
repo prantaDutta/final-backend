@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\TransactionDetailResource;
 use App\Http\Resources\TransactionResource;
 use App\Http\Resources\UserResource;
 use App\Models\Transaction;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
@@ -100,5 +102,32 @@ class TransactionController extends Controller
         ]);
 
         return response()->json(["OK"]);
+    }
+
+    // get single deposit
+    public function getSingleTransaction(Request $request, $type, $id) : JsonResponse
+    {
+        if ($type === 'deposit' || $type === 'withdraw') {
+            $transaction = Transaction::where('id', $id)
+                ->where('transaction_type', $type)
+                ->first();
+
+            $user = $request->user();
+
+            $authorized_user = $transaction->user()->findOrFail($user->id);
+
+            if ($authorized_user === null) {
+                return response()->json(["UNAUTHORIZED"], 419);
+            }
+
+            return response()->json([
+                'transaction' => new TransactionResource($transaction),
+                'details' => new TransactionDetailResource($transaction->transaction_detail)
+            ]);
+        }
+
+        return response()->json([
+            "ERROR"
+        ], 500);
     }
 }

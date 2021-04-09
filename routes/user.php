@@ -71,9 +71,6 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     // Withdraw
     Route::post('/withdraw', [TransactionController::class, 'withdraw']);
 
-    // Fetching Dashboard Data
-    Route::get('/recent-data', [UserController::class, 'recentData']);
-
     // Fetching Alternate Dashboard Data
     Route::get('/dashboard-data', [UserController::class, 'dashboardData']);
 
@@ -95,8 +92,8 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     // Account User Settings , info should be language or close-account
     Route::post('/account/{info}', [UserController::class, 'updateAccountSettings']);
 
-//    // Get Loan Preference
-//    Route::get('/get-loan-preferences', [UserController::class, 'getLoanPreferences']);
+    // Get Loan Preference
+    Route::get('/get-loan-preferences', [UserController::class, 'getLoanPreferences']);
 //
     // Saving Loan Preference
     Route::post('/save-loan-preferences', [UserController::class, 'saveLoanPreferences']);
@@ -104,8 +101,17 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     // get all installments
     Route::get('/get-all-installments/{type}', [InstallmentController::class, 'getAllInstallments']);
 
+    // get single loan for one user
+    Route::get('/get-single-loan/{id}',[LoanController::class, 'getSingleLoan']);
+
+    // get loan installments
+    Route::get('/loans/loan-installments/{loan_id}', [LoanController::class, 'getLoanInstallments']);
+
     // get single Installment
     Route::get('/get-single-installment/{id}', [InstallmentController::class, 'getSingleInstallment']);
+
+    // get single deposit
+    Route::get('/get-single-transaction/{type}/{id}', [TransactionController::class, 'getSingleTransaction']);
 
     // Pay Installment
     Route::post('/pay-installment', [InstallmentController::class, 'payInstallment']);
