@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Events\NewLoanRequestEvent;
+use App\Http\Resources\InstallmentResource;
 use App\Http\Resources\LoanResource;
 use App\Models\Loan;
 use App\Models\User;
-use App\Notifications\NewLoanRequested;
+use App\Notifications\NewLoanRequestedNotification;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
@@ -37,7 +38,7 @@ class LoanController extends Controller
         $interest = $amount * ($interest_rate / 100);
         $company_fees = $amount * 0.02;
 
-        Loan::create([
+        $loans = Loan::create([
             'loan_amount' => $amount,
             'loan_mode' => 'processing',
             'unique_loan_id' => $unique_loan_id,
@@ -50,7 +51,7 @@ class LoanController extends Controller
             'monthly_installment_with_company_fees' => $values['modifiedMonthlyInstallment']
         ]);
 
-        $user->notify(new NewLoanRequested);
+        $user->notify(new NewLoanRequestedNotification($loans));
 
         # This event is not really necessary at least for now
         # But it boosts performance
@@ -76,6 +77,49 @@ class LoanController extends Controller
         $loans = $user->loans->where('loan_mode', $loanType);
         return response()->json([
             'loans' => LoanResource::collection($loans)
+        ]);
+    }
+
+    # Get Single Loan
+    public function getSingleLoan(Request $request, $id)//: JsonResponse
+    {
+        $user = $request->user();
+
+        $loan = Loan::findOrFail($id);
+
+        $authorized_user = $loan->users()->findOrFail($user->id);
+
+        if ($authorized_user === null) {
+            return response()->json(["UNAUTHORIZED"], 419);
+        }
+
+        $user_installments = $authorized_user->installments;
+
+        $installments = '{"Total Installments": "' . count($user_installments) . '"}';
+
+        return response()->json([
+            'loan' => new LoanResource($loan),
+            'totalInstallments' => json_decode($installments),
+        ]);
+    }
+
+    // get loan installments
+    public function getLoanInstallments(Request $request, $loan_id)
+    {
+        $loan = Loan::findOrFail($loan_id);
+        $user = $request->user();
+
+        $authorized_user = $loan->users()->findOrFail($user->id);
+
+        if ($authorized_user === null) {
+            return response()->json(["UNAUTHORIZED"], 419);
+        }
+
+        $user_installments = $authorized_user->installments;
+
+        return response()->json([
+            'installments' => InstallmentResource::collection($user_installments),
+            'id' => $loan->id,
         ]);
     }
 }

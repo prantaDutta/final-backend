@@ -2,29 +2,45 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Nexmo\Client;
 use Nexmo\Client\Credentials\Basic;
 
 class UtilController extends Controller
 {
-    // Sending an Email
-    public function sendAnEmail($email, $title, $message, $subject, $action = null)
+    // get help
+    public function getHelp(Request $request)
     {
-        # $action will contain name, msg, url
-        $user = User::where('email', $email)->first();
+        $values = $request->get('values');
+
+        $name = $values['name'];
+        $email = $values['email'];
+        $msg = $values['message'];
+
+        try {
+            $this->sendAnEmail($name, $email, 'Help', $msg, 'Help Email');
+        } catch (Exception $exception) {
+            return $exception;
+        }
+    }
+
+    // Sending an Email
+    public function sendAnEmail($name, $email, $title, $message, $subject, $action = null): JsonResponse
+    {
         $data = [
-            'name' => $user->name,
+            'name' => $name,
             'title' => $title,
             'message' => $message,
             'action' => $action,
         ];
         Mail::send('mail', array('data' => $data), function ($message) use ($email, $subject) {
-            $message->to($email, 'Grayscale')->subject
-            ($subject);
+            $message->to($email, 'Grayscale')
+                ->subject($subject);
         });
-        return response()->json(["OK"], 200);
+        return response()->json(["OK"]);
     }
 
     // Send an SMS

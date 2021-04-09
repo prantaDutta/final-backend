@@ -24,9 +24,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
-//        $schedule->command('command:control-loan-limit')->daily();
-        $schedule->command('command:run-everyday')->everyMinute();
+//         $schedule->command('inspire')->hourly();
+        $schedule->command('backup:clean')->daily()->at('01:00');
+        $schedule->command('backup:run')->daily()->at('01:30');
+//        $schedule->command('command:control-loan-limit')->daily()->at('03:00');
+        $schedule->command('command:manage-installments')->everyMinute();
     }
 
     /**
@@ -34,7 +36,7 @@ class Kernel extends ConsoleKernel
      *
      * @return void
      */
-    protected function commands()
+    protected function commands(): void
     {
         $this->load(__DIR__ . '/Commands');
 

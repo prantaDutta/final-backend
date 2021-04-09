@@ -8,18 +8,26 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use JetBrains\PhpStorm\ArrayShape;
 
-class WelcomeMessage extends Notification implements ShouldQueue
+class SentVerifyEmailOTPNotification extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    protected string $name, $email, $otp, $uniq_id;
 
     /**
      * Create a new notification instance.
      *
-     * @return void
+     * @param $name
+     * @param $email
+     * @param $otp
+     * @param $uniq_id
      */
-    public function __construct()
+    public function __construct($name, $email, $otp, $uniq_id)
     {
-        //
+        $this->name = $name;
+        $this->email = $email;
+        $this->otp = $otp;
+        $this->uniq_id = $uniq_id;
     }
 
     /**
@@ -35,37 +43,26 @@ class WelcomeMessage extends Notification implements ShouldQueue
     /**
      * Get the mail representation of the notification.
      *
-     * @param mixed $notifiable
      * @return MailMessage
      */
-    public function toMail(mixed $notifiable): MailMessage
+    public function toMail(): MailMessage
     {
-        if ($notifiable->role === "lender") {
-            $optionalMsg = 'Lend and Earn Now';
-        } else {
-            $optionalMsg = 'Borrow Money Today';
-        }
         return (new MailMessage)
-            ->subject('Welcome to Grayscale. ' . $optionalMsg)
-            ->greeting('Hello ' . $notifiable->name)
+            ->subject('Verification Email')
+            ->greeting('Hello ' . $this->name)
             ->line('GrayScale is one of the fastest growing peer to peer (P2P) lending
             platforms in Bangladesh. It connects investors or lenders looking
             for high returns with creditworthy borrowers looking for short term
             personal loans.')
-            ->action('Let\'s Start', url(config('app.frontEndUrl')))
-            ->line('Verify Your Account and Start Today');
+            ->line('Your One Time Password (OTP) is ' . $this->otp)
+            ->action('Verify Your Email', url('/api/verify-email/' . $this->email . '/' . $this->uniq_id));
     }
 
     # Saving data to the database
-    #[ArrayShape(['msg' => "string"])] public function toDatabase($notifiable): array
+    #[ArrayShape(['msg' => "string"])] public function toDatabase(): array
     {
-        if ($notifiable->role === "lender") {
-            $optionalMsg = 'Lend and Earn Now';
-        } else {
-            $optionalMsg = 'Borrow Money Today';
-        }
         return [
-            'msg' => 'Welcome to Grayscale. ' . $optionalMsg
+            'msg' => 'Verification Email Sent. Check Inbox'
         ];
     }
 

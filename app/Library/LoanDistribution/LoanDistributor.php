@@ -60,9 +60,8 @@ class LoanDistributor implements ShouldQueue
 //            return;
 //        }
 
-        #   Using a while loop to iterate until the loan amount is not
-        #   equal to distributing amount and flag is true
-
+        # Using a while loop to iterate until the loan amount is not
+        # equal to distributing amount and flag is true
         while ($this->flag === false) {
             if ($this->amount > $this->distributing_amount) {
                 $this->distributeToALender();
@@ -81,6 +80,7 @@ class LoanDistributor implements ShouldQueue
             $this->distributing_amount = 0;
             $this->lender_data = [];
             $this->flag = false;
+            $this->lender_ids = [];
             $this->retry_count++;
 
             # this condition will check the retry count
@@ -107,6 +107,7 @@ class LoanDistributor implements ShouldQueue
 
         $current_loan->update([
             'lender_data' => $this->lender_data,
+            'loan_mode' => 'ongoing',
         ]);
 
         // attaching the loan to the borrower
@@ -230,7 +231,6 @@ class LoanDistributor implements ShouldQueue
                 ->where('role', 'lender')
                 ->whereNotIn('id', $this->lender_ids)
                 ->whereHas('util', function ($q) {
-//                    $q->where('loan_limit', '<=', 5);
                     $q->whereRaw('loan_limit= (select min(`loan_limit`) from utils)');
                 })
                 ->where('verified', 'verified')
@@ -240,7 +240,7 @@ class LoanDistributor implements ShouldQueue
                 $this->handleNotFound();
             }
 
-        } while ($user->balance < $user->loan_preference->maximum_distributed_amount);
+        } while ($user->balance <= $user->loan_preference->maximum_distributed_amount);
 
         return $user;
     }

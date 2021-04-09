@@ -8,26 +8,18 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use JetBrains\PhpStorm\ArrayShape;
 
-class SendVerifyEmailOTP extends Notification implements ShouldQueue
+class AccountVerificationSuccessful extends Notification implements ShouldQueue
 {
     use Queueable;
-
-    protected string $name, $email, $otp, $uniq_id;
 
     /**
      * Create a new notification instance.
      *
-     * @param $name
-     * @param $email
-     * @param $otp
-     * @param $uniq_id
+     * @return void
      */
-    public function __construct($name, $email, $otp, $uniq_id)
+    public function __construct()
     {
-        $this->name = $name;
-        $this->email = $email;
-        $this->otp = $otp;
-        $this->uniq_id = $uniq_id;
+        //
     }
 
     /**
@@ -43,26 +35,32 @@ class SendVerifyEmailOTP extends Notification implements ShouldQueue
     /**
      * Get the mail representation of the notification.
      *
+     * @param mixed $notifiable
      * @return MailMessage
      */
-    public function toMail(): MailMessage
+    public function toMail(mixed $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Verification Email')
-            ->greeting('Hello ' . $this->name)
+            ->subject('Account Verified')
+            ->greeting('Hello ' . $notifiable->name)
             ->line('GrayScale is one of the fastest growing peer to peer (P2P) lending
             platforms in Bangladesh. It connects investors or lenders looking
             for high returns with creditworthy borrowers looking for short term
             personal loans.')
-            ->line('Your One Time Password (OTP) is ' . $this->otp)
-            ->action('Verify Your Email', url('/api/verify-email/' . $this->email . '/' . $this->uniq_id));
+            ->line('Thank you for your verification request. We reviewed your documents
+            and pleased to announce that your account is now verified')
+            ->line($notifiable->role === 'lender'
+                ? 'You will now receive loans'
+                : 'You can now apply for a loan'
+            )
+            ->action('Let\'s Start', url(config('app.frontEndUrl')))
+            ->line('Verify Your Account and Start Today');
     }
 
-    # Saving data to the database
     #[ArrayShape(['msg' => "string"])] public function toDatabase(): array
     {
         return [
-            'msg' => 'Verification Email Sent. Check Inbox'
+            'msg' => 'Your Account is Successfully Verified',
         ];
     }
 

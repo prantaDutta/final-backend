@@ -4,14 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
     // register the user
-    public function register(Request $request)
+    public function register(Request $request): UserResource|JsonResponse
     {
         $request->validate([
             'name' => 'required|string',
@@ -24,12 +28,12 @@ class AuthController extends Controller
         ]);
 
         User::create([
-            'email' => $request->email,
-            'name' => $request->name,
-            'role' => $request->role,
+            'email' => $request->get('email'),
+            'name' => $request->get('name'),
+            'role' => $request->get('role'),
             'verified' => 'unverified',
             'balance' => 0.00,
-            'password' => bcrypt($request->password)
+            'password' => bcrypt($request->get('password'))
         ]);
 
         $credentials = $request->only('email', 'password');
@@ -45,7 +49,7 @@ class AuthController extends Controller
     }
 
     // logging the user
-    public function login(Request $request)
+    public function login(Request $request): UserResource|JsonResponse
     {
 //        dd($request);
         $request->validate([
@@ -67,12 +71,12 @@ class AuthController extends Controller
     }
 
     // logging user out
-    public function logout(Request $request)
+    public function logout(Request $request): Response|Application|ResponseFactory
     {
         $request->user()->unreadNotifications->markAsRead();
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return response('OK', 200);
+        return response('OK');
     }
 }

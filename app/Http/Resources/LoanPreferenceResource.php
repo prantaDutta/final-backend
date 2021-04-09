@@ -15,18 +15,10 @@ class LoanPreferenceResource extends JsonResource
      */
     public function toArray($request)
     {
-//        return parent::toArray($request);
-        $distributed_array = explode(', ', $this->distributed_amounts);
-//        foreach ($distributed_array as $key => $value) {
-//            if (empty($value)) {
-//                unset($distributed_array[$key]);
-//            }
-//        }
         return [
             'id' => $this->id,
             'userId' => $this->user_id,
-            'distributedArray' => $distributed_array,
-            'latestDepositedAmount' => $this->latest_deposited_amount
+            'maximumDistributedAmount' => $this->maximum_distributed_amount
         ];
     }
 }

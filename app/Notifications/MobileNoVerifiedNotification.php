@@ -8,8 +8,9 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use JetBrains\PhpStorm\ArrayShape;
 
-class EmailVerified extends Notification implements ShouldQueue
+class MobileNoVerifiedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -26,10 +27,9 @@ class EmailVerified extends Notification implements ShouldQueue
     /**
      * Get the notification's delivery channels.
      *
-     * @param mixed $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via(): array
     {
         return ['mail', 'database'];
     }
@@ -40,31 +40,30 @@ class EmailVerified extends Notification implements ShouldQueue
      * @param mixed $notifiable
      * @return MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail(mixed $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Email Verified')
+            ->subject('Mobile No. Verified')
             ->greeting('Hello ' . $notifiable->name)
-            ->line('Your Email ' . $notifiable->email . ' is successfully verified')
+            ->line('Your Mobile No. is successfully verified')
             ->line('Thank You For Your Co-operation')
             ->action('Go to Homepage', url('/'));
     }
 
     # Saving data to the database
-    public function toDatabase($notifiable)
+    #[ArrayShape(['msg' => "string"])] public function toDatabase($notifiable): array
     {
         return [
-            'msg' => 'Your Email is Successfully Verified'
+            'msg' => 'Your Mobile No is Successfully Verified'
         ];
     }
 
     /**
      * Get the array representation of the notification.
      *
-     * @param mixed $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray(): array
     {
         return [
             //

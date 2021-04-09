@@ -20,4 +20,5 @@ for ($i = 1; $i <= 31; $i++) {
 
 return [
     'penalty_data' => $penalty_data,
+    'default_interest_rate' => env('DEFAULT_INTEREST_RATE', 7),
 ];

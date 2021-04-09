@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use App\Models\Verification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -16,22 +15,26 @@ class VerificationController extends Controller
         $values = $request->get('values');
         // saving user data
         $user = User::where('email', $values['email'])->first();
-        $user->name = $values['name'];
+        if ($user === null) {
+            return abort(500);
+        }
         $user->verified = 'pending';
         $user->save();
-        // saving verification Data
-        $verification = new Verification();
-        $verification->user_id = $values['id'];
-        $verification->address = $values['address'];
-        $verification->borrower_type = $user->role === 'lender' ? null : $values['borrowerType'];
-        $verification->date_of_birth = Carbon::parse($values['dateOfBirth'])->format('Y-m-d');
-        $verification->gender = $values['gender'];
-        $verification->zila = $values['zila'];
-        $verification->division = $values['division'];
-        $verification->zip_code = $values['zip_code'];
-        $verification->verification_photos = json_encode($values['verificationPhotos']);
 
-        $user->verification()->save($verification);
+        $user->verification()->updateOrCreate(
+            [
+                'user_id' => $values['id'],
+            ],
+            [
+                'date_of_birth' => Carbon::parse($values['dateOfBirth'])->format('Y-m-d'),
+                'gender' => $values['gender'],
+                'address' => $values['address'],
+                'borrower_type' => $user->role === 'lender' ? null : $values['borrowerType'],
+                'division' => $values['division'],
+                'zila' => $values['zila'],
+                'zip_code' => $values['zip_code'],
+                'verification_photos' => json_encode($values['verificationPhotos'], JSON_THROW_ON_ERROR),
+            ]);
 
         return new UserResource($user);
     }

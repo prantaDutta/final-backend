@@ -2,20 +2,15 @@
 
 namespace App\Notifications;
 
-use App\Models\User;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Notifications\Messages\NexmoMessage;
 use Illuminate\Notifications\Notification;
-use JetBrains\PhpStorm\ArrayShape;
 
-class SendMobileOTP extends Notification implements ShouldQueue
+class SentMobileOTPNotification extends Notification implements ShouldQueue
 {
     use Queueable;
-
-    protected int $otp;
 
     /**
      * Create a new notification instance.
@@ -23,9 +18,11 @@ class SendMobileOTP extends Notification implements ShouldQueue
      * @return void
      * @throws Exception
      */
-    public function __construct()
+    public function __construct(
+        public int $otp,
+    )
     {
-        $this->otp = random_int(100000, 999999);
+
     }
 
     /**
@@ -44,15 +41,8 @@ class SendMobileOTP extends Notification implements ShouldQueue
      * @param mixed $notifiable
      * @return array
      */
-    #[ArrayShape(['msg' => "string"])] public function toDatabase(mixed $notifiable): array
+    public function toDatabase(mixed $notifiable): array
     {
-        $user = User::where('email', $notifiable->email)->first();
-        if ($user === null) {
-            throw new ModelNotFoundException();
-        }
-        $user->util()->update([
-            'mobile_no_verify_otp' => $this->otp
-        ]);
         return [
             'msg' => 'You Will receive an OTP in a minute'
         ];

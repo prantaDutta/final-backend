@@ -31,7 +31,7 @@ class VerificationResource extends JsonResource
             'division' => $this->division,
             'zila' => $this->zila,
             'zipCode' => $this->zip_code,
-            'verificationPhotos' => $this->verification_photos,
+//            'verificationPhotos' => $this->verification_photos,
         ];
     }
 }

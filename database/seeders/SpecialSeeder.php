@@ -193,7 +193,7 @@ class SpecialSeeder extends Seeder
                 'division' => 'chattogram',
                 'zila' => 'chattogram',
                 'zip_code' => '4000',
-                'verification_photos' => '{"recentPhoto": "upload_44eda4489b5ceab3cf879117c19785a5.jpg", "addressProof": "upload_6463f29a4f564fd48330f235025919d1.jpg", "nidOrPassport": "upload_4da218498b851729d184d2256eea1ca6.jpg", "bankAccountStatements": "upload_d0b598be4d344630a300fcf09d8c77cb.jpg#upload_f68d7ca36095339e620b3249ab479bec.jpg#upload_e3aba93cb22fb7885ca15572ce88c3e8.jpg#"}',
+                'verification_photos' => '{"salarySlip": "upload_15b3fd02ee5aeec3b984ad66410628c2.png", "recentPhoto": "upload_392b7e08f32064d419f808684b7a4680.png", "addressProof": "upload_a6301c09c628e5648f8627abdc33d4cd.png", "nidOrPassport": "upload_3372b237e397bbc109b8cc264948fa0a.jpg", "employeeIdCard": "upload_7a23d62d88a8999177a8f460af63ab1e.png", "bankAccountStatements": "upload_907cb6f0e5418b267309231fc0b35672.jpg#upload_4ca1b4b40ce2b8fc540c9cba8747416b.jpg#upload_217692232c84340eb094390ff41aa6ab.jpg#"}',
             ]);
             $amounts = [500, 1000, 1500, 2000, 2500, 3000];
 
@@ -209,6 +209,7 @@ class SpecialSeeder extends Seeder
         $admin = User::find(1);
         $admin->administration()->create([
             'penalty_data' => config('constants.penalty_data'),
+            'default_interest_rate' => config('constants.default_interest_rate'),
         ]);
     }
 }

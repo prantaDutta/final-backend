@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\InstallmentController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UtilController;
 use App\Library\LoanDistribution\GenerateLenderDataArray;
-use App\Library\LoanDistribution\LenderData;
 use App\Library\LoanDistribution\TestDistributor;
-use App\Models\Loan;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +23,9 @@ Route::group(['middleware' => ['web']], static function () {
 
     // Verify Email
     Route::get('/verify-email/{email}/{token}', [UserController::class, 'verifyEmail']);
+
+    // Send Help
+    Route::post('/get-help', [UtilController::class, 'getHelp']);
 
     // This is temporary
     Route::get('/testing-distributing/{amount}', static function ($amount) {
@@ -62,6 +65,6 @@ Route::group(['middleware' => ['web']], static function () {
 //    Route::get('/check-amount', static function () {
 //
 //    });
-    Route::get('/check-amount/{type}', [\App\Http\Controllers\InstallmentController::class, 'getAllInstallments']);
-
+//    Route::get('/check-amount/{type}', [\App\Http\Controllers\InstallmentController::class, 'getAllInstallments']);
+    Route::get('/check-installment/{amount}/{id}', [InstallmentController::class, 'payInstallment']);
 });

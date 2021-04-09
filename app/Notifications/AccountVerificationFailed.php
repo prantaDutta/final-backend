@@ -2,13 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use JetBrains\PhpStorm\ArrayShape;
 
-class NewLoanRequested extends Notification implements ShouldQueue
+class AccountVerificationFailed extends Notification
 {
     use Queueable;
 
@@ -25,10 +24,9 @@ class NewLoanRequested extends Notification implements ShouldQueue
     /**
      * Get the notification's delivery channels.
      *
-     * @param mixed $notifiable
      * @return array
      */
-    public function via($notifiable)
+    public function via(): array
     {
         return ['mail', 'database'];
     }
@@ -39,42 +37,35 @@ class NewLoanRequested extends Notification implements ShouldQueue
      * @param mixed $notifiable
      * @return MailMessage
      */
-    public function toMail($notifiable)
+    public function toMail(mixed $notifiable): MailMessage
     {
-        $user = User::where('email', $notifiable->email)->first();
-        $loans = $user->loans()->latest()->first();
         return (new MailMessage)
-            ->subject('New Loan Requested')
+            ->subject('Verification Denied')
             ->greeting('Hello ' . $notifiable->name)
             ->line('GrayScale is one of the fastest growing peer to peer (P2P) lending
             platforms in Bangladesh. It connects investors or lenders looking
             for high returns with creditworthy borrowers looking for short term
             personal loans.')
-            ->line('We Received new Loan Request For You with following details')
-            ->line('The Loan Amount: ' . $loans->loan_amount . 'Tk.')
-            ->line('The Loan Duration: ' . $loans->loan_duration . 'Months')
-            ->line('The Interest Rate: ' . $loans->interest_rate . '%')
-            ->line('You have to pay ' . $loans->monthly_installment_with_company_fees . 'Tk. every Months')
-            ->action('Go to Loans', url(config('app.frontEndUrl')) . '/loans')
-            ->line('Thank You, ')
-            ->line('Grayscale');
+            ->line('Thank you for your verification request. We reviewed your documents
+            and found one or more documents or information to be unauthentic')
+            ->line('Please Submit Valid papers and information')
+            ->action('Let\'s Start', url(config('app.frontEndUrl')))
+            ->line('Verify Your Account and Start Today');
     }
 
-    # Saving data to the database
-    public function toDatabase($notifiable)
+    #[ArrayShape(['msg' => "string"])] public function toDatabase(): array
     {
         return [
-            'msg' => 'You Requested a new Loan'
+            'msg' => 'Your Account Verification is Denied',
         ];
     }
 
     /**
      * Get the array representation of the notification.
      *
-     * @param mixed $notifiable
      * @return array
      */
-    public function toArray($notifiable)
+    public function toArray(): array
     {
         return [
             //

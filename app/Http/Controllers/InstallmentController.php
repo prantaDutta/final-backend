@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\InstallmentResource;
 use App\Http\Resources\LoanResource;
+use App\Http\Resources\UserResource;
 use App\Models\Installment;
-use App\Models\User;
+use App\Models\Loan;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -41,28 +42,59 @@ class InstallmentController extends Controller
         return response()->json([
             'installment' => new InstallmentResource($installment),
             'loan' => new LoanResource($installment->loan),
+            'user' => new UserResource($installment->user),
         ]);
     }
 
     # Pay Installment
-    public function payInstallment(Request $request)
+    public function payInstallment(Request $request): JsonResponse
     {
+
         $amount = $request->get('amount');
         $id = $request->get('id');
         $user = $request->user();
 
-        $installment = Installment::findOrFail($id);
+        // checking whether the borrower has enough balance to pay
+        if ((int)$user->balance >= (int)$amount) {
+            $installment = Installment::findOrFail($id);
 
-        $total_amount = $installment->total_amount;
-
-        if ($user->balance >= $total_amount) {
+            // decrementing borrower balance
             DB::table('users')
                 ->where('id', $user->id)
-                ->decrement('balance', $total_amount);
+                ->decrement('balance', $amount);
 
+            // making the installment paid
             $installment->update([
                 'status' => 'paid',
             ]);
+
+            // finding the current loan
+            $current_loan = $installment->loan;
+
+            // finding every lender
+            foreach ($current_loan->lender_data as $key => $lender_datum) {
+                // finding the lender installment row
+                $lender_installment = Installment::where('loan_id', $current_loan->id)
+                    ->where('installment_no', $installment->installment_no)
+                    ->whereHas('user', function ($q) use ($lender_datum) {
+                        $q->where('id', $lender_datum['lender_id']);
+                    })
+                    ->first();
+
+                if ($lender_installment === null) {
+                    return response()->json(["ERROR"], 500);
+                }
+
+                // incrementing the lender balance
+                DB::table('users')
+                    ->where('id', $lender_installment->user_id)
+                    ->increment('balance', $lender_installment->total_amount);
+
+                // marking the installment as paid
+                $lender_installment->update([
+                    'status' => 'paid',
+                ]);
+            }
 
             return response()->json([
                 "OK"
