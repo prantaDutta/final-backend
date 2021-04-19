@@ -14,9 +14,11 @@
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
+        "larabug/larabug": "^2.3",
         "laravel/framework": "^8.12",
         "laravel/nexmo-notification-channel": "^2.5",
         "laravel/sanctum": "^2.8",
+        "laravel/telescope": "^4.4",
         "laravel/tinker": "^2.5",
         "nexmo/client": "^2.4",
         "nexmo/laravel": "^2.4",
@@ -70,7 +72,8 @@
         "post-update-cmd": [
             "Illuminate\\Foundation\\ComposerScripts::postUpdate",
             "@php artisan ide-helper:generate",
-            "@php artisan ide-helper:meta"
+            "@php artisan ide-helper:meta",
+            "@php artisan telescope:publish --ansi"
         ],
         "ide-helper": [
             "@php artisan ide-helper:meta",

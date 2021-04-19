@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e826407c7d2a705034caf95b76c872a1",
+    "content-hash": "f00afa0b008a02a8b5f0f78833e6f9af",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1180,6 +1180,72 @@
             "time": "2021-02-25T21:54:58+00:00"
         },
         {
+            "name": "larabug/larabug",
+            "version": "2.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/LaraBug/LaraBug.git",
+                "reference": "c064d6fbf8823655e24b58cc5d468ad26fc70398"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/LaraBug/LaraBug/zipball/c064d6fbf8823655e24b58cc5d468ad26fc70398",
+                "reference": "c064d6fbf8823655e24b58cc5d468ad26fc70398",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.0.2|^7.0",
+                "illuminate/support": "^5.5|^5.6|^5.7|^5.8|^6.0|^7.0|^8.0",
+                "php": ">=7.1.3"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.16",
+                "orchestra/testbench": "^3.8|^4.0|^5.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaraBug\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaraBug\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dennis Smink",
+                    "email": "dennissmink@gmail.com",
+                    "homepage": "http://www.dennissmink.nl",
+                    "role": "Owner"
+                }
+            ],
+            "description": "Laravel 5.8/6.x/7.x/8.x bug notifier",
+            "keywords": [
+                "error",
+                "laravel",
+                "log"
+            ],
+            "support": {
+                "issues": "https://github.com/LaraBug/LaraBug/issues",
+                "source": "https://github.com/LaraBug/LaraBug/tree/2.3.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/cannonb4ll",
+                    "type": "github"
+                }
+            ],
+            "time": "2020-11-25T06:29:27+00:00"
+        },
+        {
             "name": "laravel/framework",
             "version": "v8.35.1",
             "source": {
@@ -1472,6 +1538,70 @@
                 "source": "https://github.com/laravel/sanctum"
             },
             "time": "2021-03-30T21:29:22+00:00"
+        },
+        {
+            "name": "laravel/telescope",
+            "version": "v4.4.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/telescope.git",
+                "reference": "506aa21c7ead98d6666cf8341f25d4d2f333f385"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/telescope/zipball/506aa21c7ead98d6666cf8341f25d4d2f333f385",
+                "reference": "506aa21c7ead98d6666cf8341f25d4d2f333f385",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "laravel/framework": "^8.29",
+                "php": "^7.3|^8.0",
+                "symfony/var-dumper": "^5.0"
+            },
+            "require-dev": {
+                "ext-gd": "*",
+                "orchestra/testbench": "^6.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Laravel\\Telescope\\TelescopeServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laravel\\Telescope\\": "src/",
+                    "Laravel\\Telescope\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                },
+                {
+                    "name": "Mohamed Said",
+                    "email": "mohamed@laravel.com"
+                }
+            ],
+            "description": "An elegant debug assistant for the Laravel framework.",
+            "keywords": [
+                "debugging",
+                "laravel",
+                "monitoring"
+            ],
+            "support": {
+                "issues": "https://github.com/laravel/telescope/issues",
+                "source": "https://github.com/laravel/telescope/tree/v4.4.9"
+            },
+            "time": "2021-04-13T15:47:06+00:00"
         },
         {
             "name": "laravel/tinker",

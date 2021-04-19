@@ -24,7 +24,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-//         $schedule->command('inspire')->hourly();
+        // Remove telescope data daily
+        $schedule->command('telescope:prune')->daily();
+        // laravel database backup
         $schedule->command('backup:clean')->daily()->at('01:00');
         $schedule->command('backup:run')->daily()->at('01:30');
 //        $schedule->command('command:control-loan-limit')->daily()->at('03:00');

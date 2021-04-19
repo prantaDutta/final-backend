@@ -15493,6 +15493,168 @@
      
 }
 
+    namespace LaraBug { 
+            /**
+     * 
+     *
+     */ 
+        class Facade {
+                    /**
+         * 
+         *
+         * @param \Throwable $exception
+         * @param string $fileType
+         * @return bool|mixed 
+         * @static 
+         */ 
+        public static function handle($exception, $fileType = 'php', $customData = [])
+        {
+                        /** @var \LaraBug\LaraBug $instance */
+                        return $instance->handle($exception, $fileType, $customData);
+        }
+                    /**
+         * 
+         *
+         * @return bool 
+         * @static 
+         */ 
+        public static function isSkipEnvironment()
+        {
+                        /** @var \LaraBug\LaraBug $instance */
+                        return $instance->isSkipEnvironment();
+        }
+                    /**
+         * Get the last exception id given to us by the larabug API.
+         *
+         * @return string|null 
+         * @static 
+         */ 
+        public static function getLastExceptionId()
+        {
+                        /** @var \LaraBug\LaraBug $instance */
+                        return $instance->getLastExceptionId();
+        }
+                    /**
+         * 
+         *
+         * @param \Throwable $exception
+         * @return array 
+         * @static 
+         */ 
+        public static function getExceptionData($exception)
+        {
+                        /** @var \LaraBug\LaraBug $instance */
+                        return $instance->getExceptionData($exception);
+        }
+                    /**
+         * 
+         *
+         * @param $variables
+         * @return array 
+         * @static 
+         */ 
+        public static function filterVariables($variables)
+        {
+                        /** @var \LaraBug\LaraBug $instance */
+                        return $instance->filterVariables($variables);
+        }
+                    /**
+         * 
+         *
+         * @param $exceptionClass
+         * @return bool 
+         * @static 
+         */ 
+        public static function isSkipException($exceptionClass)
+        {
+                        /** @var \LaraBug\LaraBug $instance */
+                        return $instance->isSkipException($exceptionClass);
+        }
+                    /**
+         * 
+         *
+         * @param array $data
+         * @return bool 
+         * @static 
+         */ 
+        public static function isSleepingException($data)
+        {
+                        /** @var \LaraBug\LaraBug $instance */
+                        return $instance->isSleepingException($data);
+        }
+                    /**
+         * 
+         *
+         * @return array|null 
+         * @static 
+         */ 
+        public static function getUser()
+        {
+                        /** @var \LaraBug\LaraBug $instance */
+                        return $instance->getUser();
+        }
+                    /**
+         * 
+         *
+         * @param array $data
+         * @return bool 
+         * @static 
+         */ 
+        public static function addExceptionToSleep($data)
+        {
+                        /** @var \LaraBug\LaraBug $instance */
+                        return $instance->addExceptionToSleep($data);
+        }
+                    /**
+         * 
+         *
+         * @param int $expectedCount
+         * @static 
+         */ 
+        public static function assertRequestsSent($expectedCount)
+        {
+                        /** @var \LaraBug\Fakes\LaraBugFake $instance */
+                        return $instance->assertRequestsSent($expectedCount);
+        }
+                    /**
+         * 
+         *
+         * @param mixed $throwable
+         * @param callable|null $callback
+         * @static 
+         */ 
+        public static function assertNotSent($throwable, $callback = null)
+        {
+                        /** @var \LaraBug\Fakes\LaraBugFake $instance */
+                        return $instance->assertNotSent($throwable, $callback);
+        }
+                    /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function assertNothingSent()
+        {
+                        /** @var \LaraBug\Fakes\LaraBugFake $instance */
+                        return $instance->assertNothingSent();
+        }
+                    /**
+         * 
+         *
+         * @param mixed $throwable
+         * @param callable|null $callback
+         * @static 
+         */ 
+        public static function assertSent($throwable, $callback = null)
+        {
+                        /** @var \LaraBug\Fakes\LaraBugFake $instance */
+                        return $instance->assertSent($throwable, $callback);
+        }
+         
+    }
+     
+}
+
     namespace Illuminate\Http { 
             /**
      * 
@@ -18735,6 +18897,7 @@ namespace  {
             class View extends \Illuminate\Support\Facades\View {}
             class Flare extends \Facade\Ignition\Facades\Flare {}
             class Nexmo extends \Nexmo\Laravel\Facade\Nexmo {}
+            class LaraBug extends \LaraBug\Facade {}
      
 }
 

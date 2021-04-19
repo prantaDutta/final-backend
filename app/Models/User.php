@@ -154,10 +154,9 @@ class User extends Authenticatable
     /**
      * Route notifications for the Nexmo channel.
      *
-     * @param Notification $notification
-     * @return string
+     * @return int|string|null
      */
-    public function routeNotificationForNexmo($notification): int|string|null
+    public function routeNotificationForNexmo(): int|string|null
     {
         return $this->mobile_no;
     }

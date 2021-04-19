@@ -23,7 +23,7 @@ class LoanResource extends JsonResource
             'interestRate' => $this->interest_rate,
             'monthlyInstallment' => $this->monthly_installment_with_company_fees,
             'loanMode' => $this->loan_mode,
-            'modifiedMonthlyInstallment' => $this->monthly_installment_with_company_fees,
+//            'modifiedMonthlyInstallment' => $this->monthly_installment_with_company_fees,
         ];
     }
 }
