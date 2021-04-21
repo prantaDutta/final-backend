@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\NexmoMessage;
 use Illuminate\Notifications\Notification;
 
-class SentMobileOTPNotification extends Notification implements ShouldQueue
+class SentMobileOTPNotification extends Notification
 {
     use Queueable;
 
@@ -32,7 +32,7 @@ class SentMobileOTPNotification extends Notification implements ShouldQueue
      */
     public function via(): array
     {
-        return ['database' /*, 'nexmo' */];
+        return ['nexmo', 'database' ];
     }
 
     /**
@@ -55,11 +55,11 @@ class SentMobileOTPNotification extends Notification implements ShouldQueue
      */
     public function toNexmo(): NexmoMessage|array
     {
-        // Uncomment this line to send message
-//        return (new NexmoMessage)
-//            ->content('Your Grayscale OTP is '.$this->otp)
-//            ->from('Grayscale');
-        return [];
+        // Uncomment this lines to send message
+        return (new NexmoMessage)
+            ->content('Your Grayscale OTP is '. $this->otp)
+            ->from('Grayscale');
+//        return [];
     }
 
     /**
