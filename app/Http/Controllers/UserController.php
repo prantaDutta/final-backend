@@ -500,4 +500,16 @@ class UserController extends Controller
             'loanPreference' => new LoanPreferenceResource($user->loan_preference),
         ]);
     }
+
+    // get default interest rate
+    public function getDefaultInterestRate(): JsonResponse
+    {
+        $admin = User::where('role', 'admin')->first();
+        if ($admin === null) {
+            return response()->json(["Error"], 500);
+        }
+        return response()->json([
+            'interestRate' => $admin->administration->default_interest_rate,
+        ]);
+    }
 }

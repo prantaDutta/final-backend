@@ -56,10 +56,10 @@ class SentMobileOTPNotification extends Notification
     public function toNexmo(): NexmoMessage|array
     {
         // Uncomment this lines to send message
-        return (new NexmoMessage)
-            ->content('Your Grayscale OTP is '. $this->otp)
-            ->from('Grayscale');
-//        return [];
+//        return (new NexmoMessage)
+//            ->content('Your Grayscale OTP is '. $this->otp)
+//            ->from('Grayscale');
+        return [];
     }
 
     /**

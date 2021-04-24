@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\InstallmentResource;
+use App\Http\Resources\LoanPreferenceResource;
 use App\Http\Resources\LoanResource;
 use App\Http\Resources\TransactionDetailResource;
 use App\Http\Resources\TransactionResource;
@@ -358,4 +359,20 @@ class AdminController extends Controller
 
         return response()->json(['OK']);
     }
+
+//    public function getLenderByAmount($amount)//: JsonResponse
+//    {
+//        $lenders = User::where('role', 'lender')
+//            ->with('loan_preference')
+//            ->whereHas('loan_preference', function($q) use ($amount){
+//                $q->where('maximum_distributed_amount', '>=', $amount);
+//            })
+//            ->get();
+//
+//        return $lenders;
+////        return response()->json([
+////            'lenders' => UserResource::collection($lenders),
+////            'preference' => LoanPreferenceResource::collection($lenders->loan_preference)
+////        ]);
+//    }
 }

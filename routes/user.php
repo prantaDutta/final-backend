@@ -115,4 +115,7 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
 
     // Pay Installment
     Route::post('/pay-installment', [InstallmentController::class, 'payInstallment']);
+
+    // Get Default interest Rate
+    Route::get('/get-default-interest-rate', [UserController::class, 'getDefaultInterestRate']);
 });

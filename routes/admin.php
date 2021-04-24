@@ -67,4 +67,7 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
 
     // update default interest rate
     Route::post('/update-interest-rate', [AdminController::class, 'updateInterestRate']);
+
+    // get lender by amount
+//    Route::get('/get-lender-by-amount/{amount}', [AdminController::class, 'getLenderByAmount']);
 });

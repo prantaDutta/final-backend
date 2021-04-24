@@ -33,7 +33,7 @@ class LoanDistributor implements ShouldQueue
 
     /**
      * LoanDistributor constructor.
-     * Initializes the distribution amount
+     * Initializes the loan distributor
      * @param User $the_borrower
      * @param int $amount
      * @param string $unique_loan_id
@@ -165,6 +165,9 @@ class LoanDistributor implements ShouldQueue
     protected function distributeToALender(): void
     {
         [$user_id, $current_distributed_amount] = $this->calculateDistribution();
+        if ($this->flag === true) {
+            return;
+        }
         $this->distributing_amount += $current_distributed_amount;
 
         # If distributing amount gets bigger than loan amount
@@ -193,13 +196,14 @@ class LoanDistributor implements ShouldQueue
 
     /**
      * This function calculates the necessary condition for loan distribution
-     * @return array|JsonResponse
+     * @return array|JsonResponse|null
      */
-    protected function calculateDistribution(): array|JsonResponse
+    protected function calculateDistribution(): array|JsonResponse|null
     {
         $user = $this->generateARandomUser();
         if ($user === null) {
             $this->handleNotFound();
+            return null;
         }
 
         $maximum_distributed_amount = $user->loan_preference->maximum_distributed_amount;
@@ -237,10 +241,12 @@ class LoanDistributor implements ShouldQueue
                 ->first();
 
             if ($user === null) {
+                $this->flag = true;
                 $this->handleNotFound();
+                break;
             }
 
-        } while ($user->balance <= $user->loan_preference->maximum_distributed_amount);
+        } while ($user?->balance <= $user?->loan_preference->maximum_distributed_amount);
 
         return $user;
     }
