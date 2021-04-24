@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\InstallmentResource;
-use App\Http\Resources\LoanPreferenceResource;
 use App\Http\Resources\LoanResource;
 use App\Http\Resources\TransactionDetailResource;
 use App\Http\Resources\TransactionResource;
@@ -18,13 +17,13 @@ use App\Notifications\AccountVerificationFailed;
 use App\Notifications\AccountVerificationSuccessful;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use JsonException;
 
 class AdminController extends Controller
 {
-    // getting all the verification requests
+    // getting all the verification requests and Users
     public function getUsers($verified): JsonResponse
     {
+        // $verified can be all, verified, pending and unverified
         if ($verified === 'all') {
             $user = User::all();
         } else {
@@ -35,15 +34,14 @@ class AdminController extends Controller
                 'users' => UserResource::collection($user)
             ]);
         }
-        return response()->json(['users' => []], 200);
+        return response()->json(['users' => []]);
     }
 
-    // getting single verification requests
-
+    // getting single user
     /**
      * @param $id
      * @return JsonResponse
-     * @throws JsonException
+     * @throws \JsonException
      */
     public function getSingleUser($id): JsonResponse
     {
@@ -118,7 +116,7 @@ class AdminController extends Controller
         ], 500);
     }
 
-    // get loans for one user
+    // get loans, installments and transactions count for one user
     public function getThingsForOneUser($type, $id): JsonResponse
     {
         $user = User::findOrFail($id);
@@ -163,7 +161,10 @@ class AdminController extends Controller
     }
 
     # Getting one single loan details
-    public function getSingleLoan($id) //: JsonResponse
+    /**
+     * @throws \JsonException
+     */
+    public function getSingleLoan($id) : JsonResponse
     {
         $loan = Loan::findOrFail($id);
 
@@ -191,8 +192,8 @@ class AdminController extends Controller
         ]);
     }
 
-    // fetching Alternate Dashboard Data
-    protected function getUserDetailsWithPivotAmount($users)
+    // Get All Lenders and borrowers with pivot amount
+    protected function getUserDetailsWithPivotAmount($users): array
     {
         $user_data = '{';
         $user_ids = [];
@@ -212,7 +213,7 @@ class AdminController extends Controller
     }
 
     // get all loan installments
-    public function getLoanInstallments($id)
+    public function getLoanInstallments($id): JsonResponse
     {
         $loan = Loan::findOrFail($id);
 
@@ -222,8 +223,7 @@ class AdminController extends Controller
         ]);
     }
 
-    // Get all Transactions
-
+    // Get Dashboard data
     public function dashboardData(): JsonResponse
     {
         $verification_requests = User::where('verified', 'pending')->count();
@@ -238,8 +238,7 @@ class AdminController extends Controller
         ]);
     }
 
-    // Get Single Withdrawal Request
-
+   // Get all, pending etc. Transactions
     public function getTransactions($type, $status): JsonResponse
     {
         if ($type === 'all' && $status === 'all') {
@@ -259,8 +258,7 @@ class AdminController extends Controller
         ]);
     }
 
-    // marking withdrawal request as Completed or Failed
-
+    // Get Single Withdrawal Request
     public function getSingleTransactions($id): JsonResponse
     {
         $transaction = Transaction::find($id);
@@ -271,8 +269,7 @@ class AdminController extends Controller
         ]);
     }
 
-    // Get All Installments
-
+    // marking withdrawal request as Completed or Failed
     public function markTransaction($type, $id): bool
     {
         return Transaction::find($id)->update([
@@ -280,8 +277,7 @@ class AdminController extends Controller
         ]);
     }
 
-    // Get Penalty Data
-
+    // Get All Installments
     public function getAllInstallments($status): JsonResponse
     {
         if ($status !== 'all') {
@@ -295,9 +291,8 @@ class AdminController extends Controller
         ]);
     }
 
-    // update penalty data
-
-    public function getPenaltyData(Request $request)
+    // Get Penalty Data
+    public function getPenaltyData(Request $request): JsonResponse
     {
         $user = $request->user();
         return response()->json([
@@ -305,7 +300,8 @@ class AdminController extends Controller
         ]);
     }
 
-    public function updatePenaltyData(Request $request)
+    // update penalty data
+    public function updatePenaltyData(Request $request): JsonResponse
     {
         $user = $request->user();
         if ($user->role !== 'admin') {

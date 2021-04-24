@@ -29,7 +29,9 @@ class Kernel extends ConsoleKernel
         // laravel database backup
         $schedule->command('backup:clean')->daily()->at('01:00');
         $schedule->command('backup:run')->daily()->at('01:30');
-//        $schedule->command('command:control-loan-limit')->daily()->at('03:00');
+        // Control the loan limit of the lenders
+        $schedule->command('command:control-loan-limit')->daily()->at('03:00');
+        // set installment penalties and make them due from unpaid
         $schedule->command('command:manage-installments')->everyMinute();
     }
 
