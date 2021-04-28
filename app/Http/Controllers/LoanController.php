@@ -104,7 +104,7 @@ class LoanController extends Controller
     }
 
     // get loan installments
-    public function getLoanInstallments(Request $request, $loan_id)
+    public function getLoanInstallments(Request $request, $loan_id): JsonResponse
     {
         $loan = Loan::findOrFail($loan_id);
         $user = $request->user();
