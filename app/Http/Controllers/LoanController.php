@@ -24,9 +24,11 @@ class LoanController extends Controller
         # find the user first
         $user = User::find($id);
 
-//        if ($user->loans()->count() <= 3) {
+//        $ongoing_loans = $user->loans->where('loan_mode', 'ongoing');
+//
+//        if ($ongoing_loans) {
 //            return response()->json([
-//                'error' => 'You Already have three ongoing loans',
+//                'error' => 'You Already have an Ongoing Loan',
 //            ], 422);
 //        }
 

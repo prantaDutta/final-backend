@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 class TransactionController extends Controller
 {
     // get all deposits
-    public function getAllDeposits(Request $request)
+    public function getAllDeposits(Request $request): JsonResponse
     {
         $id = $request->user()->id;
         $user = User::find($id);
@@ -33,7 +33,7 @@ class TransactionController extends Controller
     }
 
     // get all withdrawals
-    public function getAllWithdrawals(Request $request)
+    public function getAllWithdrawals(Request $request): JsonResponse
     {
         $id = $request->user()->id;
         $user = User::find($id);
@@ -53,7 +53,7 @@ class TransactionController extends Controller
     }
 
     // Withdraw Money
-    public function withdraw(Request $request)
+    public function withdraw(Request $request): JsonResponse
     {
         $values = $request->get('values');
         $id = $request->get('id');

@@ -39,6 +39,11 @@ Route::group(['middleware' => ['web']], static function () {
         return $temp->generate($amount);
     });
 
+    Route::get('/random-trx-id', static function() {
+        $util = new UtilController();
+        return $util->generateAUniqueTrxId();
+    });
+
     Route::get('/random-user', static function () {
         $lender_ids = [1, 2, 3];
         do {
@@ -66,5 +71,5 @@ Route::group(['middleware' => ['web']], static function () {
 //
 //    });
 //    Route::get('/check-amount/{type}', [\App\Http\Controllers\InstallmentController::class, 'getAllInstallments']);
-    Route::get('/check-installment/{amount}/{id}', [InstallmentController::class, 'payInstallment']);
+//    Route::get('/check-installment/{amount}/{id}', [InstallmentController::class, 'payInstallment']);
 });

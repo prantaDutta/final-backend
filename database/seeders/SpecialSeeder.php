@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Http\Controllers\UtilController;
 use App\Library\LoanDistribution\GenerateLenderDataArray;
 use App\Models\Loan;
 use App\Models\User;
@@ -137,6 +138,7 @@ class SpecialSeeder extends Seeder
 
                 $createdUser->loans()->attach($created_loan, ['amount' => 500]);
 
+                $util = new UtilController();
                 $createdUser->transactions()->create([
                     'name' => $this->faker->name,
                     'email' => $this->faker->email,
@@ -144,7 +146,7 @@ class SpecialSeeder extends Seeder
                     'amount' => random_int(1000, 9999),
                     'status' => random_int(0, 2) === 0 ? "Pending" : "Completed",
                     'address' => $this->faker->address,
-                    'transaction_id' => uniqid('', true),
+                    'transaction_id' => $util->generateAUniqueTrxId(),
                     'transaction_type' => random_int(0, 1) === 0 ? "deposit" : "withdraw",
                     'currency' => "BDT",
                 ]);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Transaction;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ use Nexmo\Client\Credentials\Basic;
 class UtilController extends Controller
 {
     // get help
-    public function getHelp(Request $request)
+    public function getHelp(Request $request): Exception | JsonResponse
     {
         $values = $request->get('values');
 
@@ -22,6 +23,7 @@ class UtilController extends Controller
 
         try {
             $this->sendAnEmail($name, $email, 'Help', $msg, 'Help Email');
+            return response()->json(["OK"]);
         } catch (Exception $exception) {
             return $exception;
         }
@@ -55,5 +57,17 @@ class UtilController extends Controller
             'from' => 'Grayscale',
             'text' => 'Grayscale: ' . $msg
         ]);
+    }
+
+    public function generateAUniqueTrxId() : string
+    {
+        $length = config('app.trx_id_length');
+        $the_string = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        do {
+            $trx_id = substr(str_shuffle($the_string),1,$length);
+            $trx_id_from_database = Transaction::where('transaction_id', $trx_id)->first();
+        } while($trx_id_from_database !== null);
+
+        return $trx_id;
     }
 }

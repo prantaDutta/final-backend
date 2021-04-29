@@ -234,6 +234,7 @@ return [
 
     ],
 
-    # This Part is modified by the developers
+    # This Part is me
     'minimum_distributed_amount' => env('MINIMUM_DISTRIBUTE_AMOUNT', 2000),
+    'trx_id_length' => env('TRANSACTION_ID_LENGTH', 10),
 ];
