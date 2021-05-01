@@ -43,10 +43,11 @@ class SpecialSeeder extends Seeder
     /**
      * Run the database seeds.
      *
+     * @param UtilController $util
      * @return void
      * @throws Exception
      */
-    public function run(): void
+    public function run(UtilController $util): void
     {
         $decider = random_int(0, 2);
         if ($decider === 0) {
@@ -123,7 +124,7 @@ class SpecialSeeder extends Seeder
                 $created_loan = Loan::create([
                     'loan_amount' => $loan_amount,
                     'lender_data' => $generate_lender_array->generate($loan_amount),
-                    'unique_loan_id' => uniqid('', true),
+                    'unique_loan_id' => $util->generateAUniqueLoanId(),
                     'loan_mode' => $mode,
                     'loan_duration' => $loan_duration,
                     'interest_rate' => $interest_rate,
@@ -138,7 +139,6 @@ class SpecialSeeder extends Seeder
 
                 $createdUser->loans()->attach($created_loan, ['amount' => 500]);
 
-                $util = new UtilController();
                 $createdUser->transactions()->create([
                     'name' => $this->faker->name,
                     'email' => $this->faker->email,
@@ -178,7 +178,7 @@ class SpecialSeeder extends Seeder
                 $createdUser->installments()->create([
                     'amount' => 500,
                     'status' => $status,
-                    'unique_installment_id' => uniqid('', true),
+                    'unique_installment_id' => $util->generateAUniqueInstallmentId(),
                     'loan_id' => $loan_ids[random_int(1, $len)] ?? 1,
                     'penalty_amount' => $penalty,
                     'total_amount' => 500 + $penalty,

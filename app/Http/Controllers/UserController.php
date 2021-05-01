@@ -405,13 +405,20 @@ class UserController extends Controller
     public function getNotifications(Request $request): JsonResponse
     {
         $user = User::findOrFail($request->user()->id);
-        $notifications = $user->unreadNotifications()
-            ->orderBy('updated_at')
-            ->skip(0)->take(3)->get();
+
+        $notifications = $user->notifications()
+            ->orderBy('read_at')
+            ->orderBy('created_at', 'desc')
+            ->skip(0)->take(3)
+            ->get();
+
+//        $notifications = $user->unreadNotifications()
+//            ->orderBy('updated_at')
+//            ->skip(0)->take(3)->get();
 
         return response()->json([
             'notifications' => NotificationResource::collection($notifications),
-            'count' => $user->unreadNotifications()->count()
+            'count' => $user->unreadNotifications()->count(),
         ]);
     }
 

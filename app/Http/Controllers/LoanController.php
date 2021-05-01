@@ -16,7 +16,7 @@ use Illuminate\Http\Response;
 
 class LoanController extends Controller
 {
-    public function newLoan(Request $request): Response|JsonResponse|Application|ResponseFactory
+    public function newLoan(Request $request, UtilController $util): Response|JsonResponse|Application|ResponseFactory
     {
         $values = $request->get('values');
         $id = $request->get('id');
@@ -32,7 +32,7 @@ class LoanController extends Controller
 //            ], 422);
 //        }
 
-        $unique_loan_id = uniqid('', true);
+        $unique_loan_id = $util->generateAUniqueLoanId();
 
         # add the loan data to the user relation
         $amount = $values['amount'];

@@ -222,7 +222,8 @@ class TestDistributor
         # And assigning it to current distributing amount
         # So the amount and the distributing amount stays the same
 
-        if ($this->distributing_amount > $this->amount) {
+//        if ($this->distributing_amount > $this->amount) {
+        if ($this->amount < $this->distributing_amount) {
             $this->flag = true;
             $this->distributing_amount -= $current_distributed_amount;
             $current_distributed_amount = $this->amount - $this->distributing_amount;

@@ -2,6 +2,7 @@
 
 namespace App\Library\LoanDistribution;
 
+use App\Http\Controllers\UtilController;
 use App\Models\Loan;
 use App\Models\LoanPreference;
 use App\Models\User;
@@ -11,6 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use JetBrains\PhpStorm\Pure;
 
 class LoanDistributor implements ShouldQueue
 {
@@ -31,6 +33,9 @@ class LoanDistributor implements ShouldQueue
     // to restart the distribution
     protected int $retry_count = 0;
 
+    // initiating utilController
+    protected mixed $util;
+
     /**
      * LoanDistributor constructor.
      * Initializes the loan distributor
@@ -38,19 +43,21 @@ class LoanDistributor implements ShouldQueue
      * @param int $amount
      * @param string $unique_loan_id
      */
-    public function __construct(
+    #[Pure] public function __construct(
         protected User $the_borrower,
         protected int $amount,
         // to find the loan to distribute
         protected string $unique_loan_id,
     )
     {
+        $this->util = new UtilController();
     }
 
     /**
      * This function is called to start the distribution process
      *
      * @return void
+     * @throws Exception
      */
     public function distribute(): void
     {
@@ -161,13 +168,16 @@ class LoanDistributor implements ShouldQueue
      * This is where the magic happens
      * This function is responsible for distributing a loan
      * @return void
+     * @throws Exception
      */
     protected function distributeToALender(): void
     {
         [$user_id, $current_distributed_amount] = $this->calculateDistribution();
+
         if ($this->flag === true) {
             return;
         }
+
         $this->distributing_amount += $current_distributed_amount;
 
         # If distributing amount gets bigger than loan amount
@@ -197,6 +207,7 @@ class LoanDistributor implements ShouldQueue
     /**
      * This function calculates the necessary condition for loan distribution
      * @return array|JsonResponse|null
+     * @throws Exception
      */
     protected function calculateDistribution(): array|JsonResponse|null
     {
@@ -211,12 +222,8 @@ class LoanDistributor implements ShouldQueue
 
         # This generates a random number to slice a multiplier of 500
         # From the maximum distributed amount
-        try {
-            $random_number = random_int(1, $divisor / 2 < 1 ? 1 : $divisor / 2);
-        } catch (Exception) {
-            info('Error while generating random number');
-            return $this->handleNotFound();
-        }
+
+        $random_number = random_int(1, $divisor / 2 < 1 ? 1 : $divisor / 2);
 
         $current_distributed_amount = 500 * $random_number;
 //        $this->incrementLoanLimit($user->id);
@@ -276,7 +283,7 @@ class LoanDistributor implements ShouldQueue
     {
         $total_amount = 0;
         if (count($this->lender_data) > 1) {
-            foreach ($this->lender_data as $index => $data) {
+            foreach ($this->lender_data as $data) {
                 $total_amount += $data->amount;
             }
 
@@ -319,7 +326,7 @@ class LoanDistributor implements ShouldQueue
             $user->installments()->create([
                 'amount' => $installment_amount,
                 'status' => 'unpaid',
-                'unique_installment_id' => uniqid('', true),
+                'unique_installment_id' => $this->util->generateAUniqueInstallmentId(),
                 'loan_id' => $current_loan->id,
                 'penalty_amount' => 0,
                 'total_amount' => $installment_amount,
@@ -340,10 +347,10 @@ class LoanDistributor implements ShouldQueue
      * This function checks whether the amount is distributable or not
      * @return bool
      */
-    protected function isDistributable(): bool
-    {
-        return $this->amount >= 2000;
-    }
+//    protected function isDistributable(): bool
+//    {
+//        return $this->amount >= 2000;
+//    }
 
     /**
      * If the amount is not distributable, this function will get called

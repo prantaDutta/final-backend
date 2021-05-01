@@ -32,7 +32,7 @@ class SentMobileOTPNotification extends Notification
      */
     public function via(): array
     {
-        return ['nexmo', 'database' ];
+        return [/*'nexmo', */ 'database' ];
     }
 
     /**

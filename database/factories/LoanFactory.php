@@ -2,11 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Http\Controllers\UtilController;
 use App\Library\LoanDistribution\GenerateLenderDataArray;
 use App\Models\Loan;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Collection;
 
 class LoanFactory extends Factory
 {
@@ -16,6 +18,13 @@ class LoanFactory extends Factory
      * @var string
      */
     protected $model = Loan::class;
+    protected mixed $util;
+
+    public function __construct($count = null, ?Collection $states = null, ?Collection $has = null, ?Collection $for = null, ?Collection $afterMaking = null, ?Collection $afterCreating = null, $connection = null)
+    {
+        parent::__construct($count, $states, $has, $for, $afterMaking, $afterCreating, $connection);
+        $this->util = new UtilController();
+    }
 
     /**
      * Define the model's default state.
@@ -49,7 +58,7 @@ class LoanFactory extends Factory
         return [
             'loan_amount' => $loan_amount,
             'lender_data' => $generate_lender_array->generate($loan_amount),
-            'unique_loan_id' => uniqid('', true),
+            'unique_loan_id' => $this->util->generateAUniqueLoanId(),
             'loan_mode' => $mode,
             'loan_duration' => $loan_duration,
             'interest_rate' => $interest_rate,

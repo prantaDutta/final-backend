@@ -2,10 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Http\Controllers\UtilController;
 use App\Models\Installment;
 use App\Models\Loan;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Collection;
 
 class  InstallmentFactory extends Factory
 {
@@ -15,6 +17,13 @@ class  InstallmentFactory extends Factory
      * @var string
      */
     protected $model = Installment::class;
+    protected mixed $util;
+
+    public function __construct($count = null, ?Collection $states = null, ?Collection $has = null, ?Collection $for = null, ?Collection $afterMaking = null, ?Collection $afterCreating = null, $connection = null)
+    {
+        parent::__construct($count, $states, $has, $for, $afterMaking, $afterCreating, $connection);
+        $this->util = new UtilController();
+    }
 
     /**
      * Define the model's default state.
@@ -44,7 +53,7 @@ class  InstallmentFactory extends Factory
         return [
             'amount' => 500,
             'status' => $status,
-            'unique_installment_id' => uniqid('', true),
+            'unique_installment_id' => $this->util->generateAUniqueInstallmentId(),
             'loan_id' => $loan_ids[random_int(0, count($loan_ids))] ?? 2,
             'penalty_amount' => $penalty,
             'total_amount' => 500 + $penalty,

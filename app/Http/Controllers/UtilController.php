@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Installment;
+use App\Models\Loan;
 use App\Models\Transaction;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -69,5 +71,29 @@ class UtilController extends Controller
         } while($trx_id_from_database !== null);
 
         return $trx_id;
+    }
+
+    public function generateAUniqueInstallmentId() : string
+    {
+        $length = config('app.installment_id_length');
+        $the_string = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        do {
+            $installment_id = substr(str_shuffle($the_string),1,$length);
+            $installment_id_from_database = Installment::where('unique_installment_id', $installment_id)->first();
+        } while($installment_id_from_database !== null);
+
+        return $installment_id;
+    }
+
+    public function generateAUniqueLoanId() : string
+    {
+        $length = config('app.installment_id_length');
+        $the_string = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        do {
+            $loan_id = substr(str_shuffle($the_string),1,$length);
+            $loan_id_from_database = Loan::where('unique_loan_id', $loan_id)->first();
+        } while($loan_id_from_database !== null);
+
+        return $loan_id;
     }
 }

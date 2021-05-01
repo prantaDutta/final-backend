@@ -236,5 +236,7 @@ return [
 
     # This Part is me
     'minimum_distributed_amount' => env('MINIMUM_DISTRIBUTE_AMOUNT', 2000),
-    'trx_id_length' => env('TRANSACTION_ID_LENGTH', 10),
+    'trx_id_length' => env('RANDOM_ID_LENGTH', 10),
+    'installment_id_length' => env('RANDOM_ID_LENGTH', 10),
+    'loan_id_length' => env('RANDOM_ID_LENGTH', 10),
 ];
