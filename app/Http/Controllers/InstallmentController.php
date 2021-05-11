@@ -30,7 +30,7 @@ class InstallmentController extends Controller
         }
 
         return response()->json([
-            'installments' => InstallmentResource::collection($installments)
+            'installments' => InstallmentResource::collection($installments),
         ]);
     }
 
@@ -49,57 +49,63 @@ class InstallmentController extends Controller
     # Pay Installment
     public function payInstallment(Request $request): JsonResponse
     {
-
         $amount = $request->get('amount');
         $id = $request->get('id');
         $user = $request->user();
 
+        $user_balance = $user->balance;
         // checking whether the borrower has enough balance to pay
-        if ((int)$user->balance >= (int)$amount) {
-            $installment = Installment::findOrFail($id);
+        if ($user_balance < $amount) {
+            return response()->json([
+                "error" => "You don't have enough balance",
+            ], 500);
+        }
+        // if ($user_balance >= $amount) {
+        $installment = Installment::findOrFail($id);
 
-            // decrementing borrower balance
-            DB::table('users')
-                ->where('id', $user->id)
-                ->decrement('balance', $amount);
+        // decrementing borrower balance
+        DB::table('users')
+            ->where('id', $user->id)
+            ->decrement('balance', $amount);
 
-            // making the installment paid
-            $installment->update([
-                'status' => 'paid',
-            ]);
+        // making the installment paid
+        $installment->update([
+            'status' => 'paid',
+        ]);
 
-            // finding the current loan
-            $current_loan = $installment->loan;
+        // finding the current loan
+        $current_loan = $installment->loan;
 
-            // finding every lender
-            foreach ($current_loan->lender_data as $key => $lender_datum) {
-                // finding the lender installment row
-                $lender_installment = Installment::where('loan_id', $current_loan->id)
-                    ->where('installment_no', $installment->installment_no)
-                    ->whereHas('user', function ($q) use ($lender_datum) {
-                        $q->where('id', $lender_datum['lender_id']);
-                    })
-                    ->first();
+        // finding every lender
+        foreach ($current_loan->lender_data as $key => $lender_datum) {
+            // finding the lender installment row
+            $lender_installment = Installment::where('loan_id', $current_loan->id)
+                ->where('installment_no', $installment->installment_no)
+                ->whereHas('user', function ($q) use ($lender_datum) {
+                    $q->where('id', $lender_datum['lender_id']);
+                })
+                ->first();
 
-                if ($lender_installment === null) {
-                    return response()->json(["ERROR"], 500);
-                }
-
-                // incrementing the lender balance
-                DB::table('users')
-                    ->where('id', $lender_installment->user_id)
-                    ->increment('balance', $lender_installment->total_amount);
-
-                // marking the installment as paid
-                $lender_installment->update([
-                    'status' => 'paid',
-                ]);
+            if ($lender_installment === null) {
+                return response()->json([
+                    "error" => "Can't Find Lender Installments",
+                    "description" => "It looks like there are no lenders associated with this installment. Are you sure you created this loan?",
+                ], 500);
             }
 
-            return response()->json([
-                "OK"
+            // incrementing the lender balance
+            DB::table('users')
+                ->where('id', $lender_installment->user_id)
+                ->increment('balance', $lender_installment->total_amount);
+
+            // marking the installment as paid
+            $lender_installment->update([
+                'status' => 'paid',
             ]);
         }
-        return response()->json(["ERROR"], 500);
+
+        return response()->json([
+            "OK",
+        ]);
     }
 }

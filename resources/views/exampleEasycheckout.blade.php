@@ -31,9 +31,8 @@
 <body class="bg-light">
 <div class="container">
     <div class="py-5 text-center">
-        <h2>EasyCheckout (Popup) - SSLCommerz</h2>
-        <p class="lead">Below is an example form built entirely with Bootstrap’s form controls. We have provided this
-            sample form for understanding EasyCheckout (Popup) Payment integration with SSLCommerz.</p>
+        <h2>Deposit Now with SSLCommerz</h2>
+        <p class="lead">We are using SSLCommerz as a payment gateway where our users can deposit money at real time. This is an example template from SSLCommerz Payment gateway.</p>
     </div>
     <div class="row justify-center">
         {{--        <div class="col-md-4 order-md-2 mb-4">--}}
@@ -211,7 +210,7 @@
     </div>
 
     <footer class="my-5 pt-5 text-muted text-center text-small">
-        <p class="mb-1">&copy; 2019 Company Name</p>
+        <p class="mb-1">&copy; 2021 Grayscale. All Rights Reserved.</p>
         <ul class="list-inline">
             <li class="list-inline-item"><a href="#">Privacy</a></li>
             <li class="list-inline-item"><a href="#">Terms</a></li>
