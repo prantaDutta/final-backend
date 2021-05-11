@@ -4,9 +4,7 @@ namespace App\Providers;
 
 use App\Events\NewLoanRequestEvent;
 use App\Listeners\DistributeNewLoanListener;
-use App\Models\Transaction;
 use App\Models\User;
-use App\Observers\TransactionObserver;
 use App\Observers\UserObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -37,7 +35,8 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-//        User::observe(UserObserver::class);
-//        Transaction::observe(TransactionObserver::class);
+        if (config('app.use_observer') === true) {
+            User::observe(UserObserver::class);
+        }
     }
 }
