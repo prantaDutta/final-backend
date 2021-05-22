@@ -4,7 +4,7 @@ This is the project repository of our final Project.
 
 # Important
 
-> We are using nextjs as the frontend for this project.
+> We are using NextJS as the frontend for this project.
 > Download frontend repository from [here](https://github.com/prantaDutta/final-backend)
 
 ### Step 1
@@ -91,7 +91,7 @@ This is the project repository of our final Project.
 - If you want sslcommerz credentials, go to [this](https://developer.sslcommerz.com/registration/) link and create a sandbox account. They will send you the credentials to your email.
 
 ### Step 8
-- Go to [mailtrap](https://mailtrap.io) and create an account. Go to your inbox and you will find your credentials
+- Go to [MailTrap](https://mailtrap.io) and create an account. Go to your inbox, and you will find your credentials
 - Then add them in the env file
 
 ```angular2html
@@ -108,7 +108,14 @@ This is the project repository of our final Project.
 ```$xslt
     php artisan serve
 ```   
- 
+  - Also run the queued jobs server
+```$xslt
+    php artisan queue:work
+```
+  - Also run the scheduler that will run once a day
+```$xslt
+    php artisan schedule:work
+```
 ### Step 10
 
   - For any query, email us at prantadutta1997@gmail.com
