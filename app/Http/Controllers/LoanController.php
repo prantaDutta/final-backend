@@ -83,7 +83,7 @@ class LoanController extends Controller
     }
 
     # Get Single Loan
-    public function getSingleLoan(Request $request, $id)//: JsonResponse
+    public function getSingleLoan(Request $request, $id): JsonResponse
     {
         $user = $request->user();
 

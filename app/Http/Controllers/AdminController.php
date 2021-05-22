@@ -272,7 +272,8 @@ class AdminController extends Controller
     // marking withdrawal request as Completed or Failed
     public function markTransaction($type, $id): bool
     {
-        return Transaction::find($id)->update([
+        $transaction = Transaction::find($id);
+        return $transaction->update([
             'status' => $type
         ]);
     }
@@ -355,20 +356,4 @@ class AdminController extends Controller
 
         return response()->json(['OK']);
     }
-
-//    public function getLenderByAmount($amount)//: JsonResponse
-//    {
-//        $lenders = User::where('role', 'lender')
-//            ->with('loan_preference')
-//            ->whereHas('loan_preference', function($q) use ($amount){
-//                $q->where('maximum_distributed_amount', '>=', $amount);
-//            })
-//            ->get();
-//
-//        return $lenders;
-////        return response()->json([
-////            'lenders' => UserResource::collection($lenders),
-////            'preference' => LoanPreferenceResource::collection($lenders->loan_preference)
-////        ]);
-//    }
 }
