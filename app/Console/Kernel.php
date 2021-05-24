@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\App;
 
 class Kernel extends ConsoleKernel
 {
@@ -31,8 +32,13 @@ class Kernel extends ConsoleKernel
         $schedule->command('backup:run')->daily()->at('01:30');
         // Control the loan limit of the lenders
         $schedule->command('command:control-loan-limit')->daily()->at('03:00');
+        // The following command is for testing purpose only
+        // It will be disabled in production
+        if (App::environment('local')) {
+            $schedule->command('command:manage-installments')->withoutOverlapping();
+        }
         // set installment penalties and make them due from unpaid
-        $schedule->command('command:manage-installments')->everyMinute();
+//        $schedule->command('command:manage-installments')->daily();
     }
 
     /**

@@ -54,12 +54,6 @@ class ManageInstallments extends Command
             ->whereDate('due_date', '<=', today())
             ->get();
 
-
-
-//        $installment = Installment::where('status', 'due')
-//            ->whereDate('due_date', '<=', today())
-//            ->first();
-
         foreach ($installments as $installment) {
             $penalty = 0;
             $due_days = Carbon::parse($installment->due_date)->diffInDays();
@@ -73,7 +67,7 @@ class ManageInstallments extends Command
                 $due_days = 31;
             }
 
-            info('Penalty: ' . $penalty);
+//            info('Penalty: ' . $penalty. ' Installment ID: ' . $installment->id);
 
             foreach ($penalty_data as $penalty_datum) {
                 if ($penalty_datum['day'] === $due_days) {
