@@ -56,15 +56,20 @@ class ManageInstallments extends Command
 
         foreach ($installments as $installment) {
             $penalty = 0;
-            $due_days = Carbon::parse($installment->due_date)->diffInDays();
-            $due_months = Carbon::parse($installment->due_date)->diffInMonths();
+
+            $due_date = Carbon::parse($installment->due_date);
+
+            $due_days = $due_date->diffInDays();
+            $due_months = $due_date->diffInMonths();
+
+            $total_days_in_due_month = $due_date->daysInMonth;
 
             if ($due_months > 0) {
                 $penalty += $due_months * (int)($installment->amount / 2);
             }
 
-            if ($due_days >= 31) {
-                $due_days = 31;
+            if ($due_days > $total_days_in_due_month) {
+                $due_days = $total_days_in_due_month;
             }
 
 //            info('Penalty: ' . $penalty. ' Installment ID: ' . $installment->id);
