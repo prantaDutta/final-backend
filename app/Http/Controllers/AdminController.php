@@ -270,13 +270,13 @@ class AdminController extends Controller
     }
 
     // marking withdrawal request as Completed or Failed
-    public function markTransaction($type, $id): bool
-    {
-        $transaction = Transaction::find($id);
-        return $transaction->update([
-            'status' => $type
-        ]);
-    }
+//    public function markTransaction($type, $id): bool
+//    {
+//        $transaction = Transaction::find($id);
+//        return $transaction->update([
+//            'status' => $type
+//        ]);
+//    }
 
     // Get All Installments
     public function getAllInstallments($status): JsonResponse

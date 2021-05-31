@@ -50,7 +50,7 @@ class InstallmentController extends Controller
     # Pay Installment
     public function payInstallment(Request $request) //: JsonResponse
     {
-        $amount = $request->get('amount');
+        $amount = (int) $request->get('amount');
         $id = $request->get('id');
 //        $user = $request->user();
         $user = User::findOrFail(3);
@@ -76,8 +76,7 @@ class InstallmentController extends Controller
         foreach ($due_installments as $due_installment) {
             $due_installment_due_date = Carbon::parse($due_installment->due_date);
 
-            info($due_installment_due_date . ' ' . $installment_due_date);
-            if ($due_installment_due_date->gt($installment_due_date)) {
+            if ($due_installment_due_date->lt($installment_due_date)) {
                 $flag = true;
             }
         }
