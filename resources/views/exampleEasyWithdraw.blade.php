@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="SSLCommerz">
-    <title>Example - EasyCheckout (Popup) | SSLCommerz</title>
+    <title>Example - Easy Withdraw (Popup) | SSLCommerz</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -31,8 +31,8 @@
 <body class="bg-light">
 <div class="container">
     <div class="py-5 text-center">
-        <h2>Deposit Now with SSLCommerz</h2>
-        <p class="lead">We are using SSLCommerz as a payment gateway where our users can deposit money at real time. This is an example template from SSLCommerz Payment gateway.</p>
+        <h2>Withdraw Now with SSLCommerz</h2>
+        <p class="lead">We are using SSLCommerz as a payment gateway where our users can withdraw money at real time. This is an example template from SSLCommerz Payment gateway.</p>
     </div>
     <div class="row justify-center">
         {{--        <div class="col-md-4 order-md-2 mb-4">--}}
@@ -69,7 +69,7 @@
         {{--            </ul>--}}
         {{--        </div>--}}
         <div class="col-md-8 order-md-1 offset-md-2">
-            <h4 class="mb-3">Billing address</h4>
+            <h4 class="mb-3">Withdrawal Details</h4>
             <form method="POST" class="needs-validation" novalidate>
 
                 <div class="row">
@@ -118,14 +118,14 @@
                     <input type="email" name="customer_email" class="form-control" id="email"
                            placeholder="you@example.com" value="{{ $user->email ?: null  }}" required>
                     <div class="invalid-feedback">
-                        Please enter a valid email address for shipping updates.
+                        Please enter a valid email address for withdrawal
                     </div>
                 </div>
 
                 <div class="mb-3">
                     <label for="address">Address</label>
                     <input type="text" class="form-control" id="address" placeholder="Enter Your Address here"
-                           value="{{ $user->verification ? $user->verification->address : null  }}" required>
+                           value="{{ $user->verification->address ?? null  }}" required>
                     <div class="invalid-feedback">
                         Please enter your shipping address.
                     </div>
@@ -203,7 +203,7 @@
                         token="if you have any token validation"
                         postdata="your javascript arrays or objects which requires in backend"
                         order="If you already have the transaction generated for current order"
-                        endpoint="{{ url('/pay-via-ajax') }}"> Pay Now
+                        endpoint="{{ url('/withdraw-via-ajax') }}"> Withdraw Now
                 </button>
             </form>
         </div>

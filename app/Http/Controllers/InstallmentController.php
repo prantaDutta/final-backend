@@ -6,7 +6,8 @@ use App\Http\Resources\InstallmentResource;
 use App\Http\Resources\LoanResource;
 use App\Http\Resources\UserResource;
 use App\Models\Installment;
-use App\Models\Loan;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -47,11 +48,12 @@ class InstallmentController extends Controller
     }
 
     # Pay Installment
-    public function payInstallment(Request $request): JsonResponse
+    public function payInstallment(Request $request) //: JsonResponse
     {
         $amount = $request->get('amount');
         $id = $request->get('id');
-        $user = $request->user();
+//        $user = $request->user();
+        $user = User::findOrFail(3);
 
         $user_balance = $user->balance;
         // checking whether the borrower has enough balance to pay
@@ -60,8 +62,31 @@ class InstallmentController extends Controller
                 "error" => "You don't have enough balance",
             ], 500);
         }
-        // if ($user_balance >= $amount) {
+        // installment is the current installment
         $installment = Installment::findOrFail($id);
+
+        $loan = $installment->loan;
+
+        $due_installments = $installment::where('status', 'due')
+            ->where('loan_id', $loan->id)
+            ->get();
+
+        $flag = false;
+        $installment_due_date = Carbon::parse($installment->due_date);
+        foreach ($due_installments as $due_installment) {
+            $due_installment_due_date = Carbon::parse($due_installment->due_date);
+
+            info($due_installment_due_date . ' ' . $installment_due_date);
+            if ($due_installment_due_date->gt($installment_due_date)) {
+                $flag = true;
+            }
+        }
+
+        if ($flag === true) {
+            return response()->json([
+                "error" => "Please Pay Previous Installment First"
+            ], 422);
+        }
 
         // decrementing borrower balance
         DB::table('users')

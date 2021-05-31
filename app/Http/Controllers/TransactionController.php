@@ -52,6 +52,17 @@ class TransactionController extends Controller
         return response()->json([], 200);
     }
 
+    // Check before withdrawal
+    public function checkBeforeWithdrawal(Request $request, $amount): JsonResponse
+    {
+        $user = $request->user();
+        if ($user->verified === 'verified' && (int)$user->balance >= (int)$amount) {
+            return response()->json(["OK"]);
+        }
+
+        return response()->json(["You don't have that much"], 422);
+    }
+
     // Withdraw Money
     public function withdraw(Request $request): JsonResponse
     {

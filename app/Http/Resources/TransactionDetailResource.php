@@ -17,12 +17,12 @@ class TransactionDetailResource extends JsonResource
     {
 //        return parent::toArray($request);
         return [
-            'cardType' => $this->card_type ?? null,
-            'cardNo' => $this->card_no ?? null,
-            'bankTranId' => $this->bank_tran_id ?? null,
+            'card Type' => $this->card_type ?? null,
+            'card No' => $this->card_no ?? null,
+            'bank TranId' => $this->bank_tran_id ?? null,
 //            'error' => $this->error,
-            'cardIssuer' => $this->card_issuer ?? null,
-            'cardBrand' => $this->card_brand ?? null,
+            'card Issuer' => $this->card_issuer ?? null,
+            'card Brand' => $this->card_brand ?? null,
         ];
     }
 }

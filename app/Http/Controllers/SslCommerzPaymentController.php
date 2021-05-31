@@ -22,6 +22,17 @@ class SslCommerzPaymentController extends Controller
             ->with('zilas', $zilas);
     }
 
+    public function exampleEasyWithdraw(Request $request)
+    {
+        $user = $request->user();
+        $divisions = file_get_contents((public_path() . '/jsons/divisions.json'));
+        $zilas = file_get_contents((public_path() . '/jsons/zilas.json'));
+        return view('exampleEasyWithdraw')
+            ->with('user', $user)
+            ->with('divisions', $divisions)
+            ->with('zilas', $zilas);
+    }
+
     public function exampleHostedCheckout()
     {
         return view('exampleHosted');
@@ -176,6 +187,86 @@ class SslCommerzPaymentController extends Controller
         }
     }
 
+    public function withdrawViaAjax(Request $request)
+    {
+        # Here you have to receive all the order data to initiate the payment.
+        # Lets your oder transaction information are saving in a table called "transactions"
+        # In transactions table order uniq identity is "transaction_id","status" field contain status of the transaction, "amount" is the order amount to be paid and "currency" is for storing Site Currency which will be checked with paid currency.
+        $request_data = json_decode($request->get('cart_json'), true);
+
+        Validator::make($request_data, [
+            'cus_name' => 'required',
+            'cus_email' => 'required',
+            'cus_addr1' => 'required',
+            'cus_phone' => 'required',
+            'amount' => 'required'
+        ])->validate();
+
+        $post_data = array();
+        $post_data['total_amount'] = $request_data['amount']; # You cant not pay less than 10
+        $post_data['currency'] = "BDT";
+        $util = new UtilController();
+        $post_data['tran_id'] = $util->generateAUniqueTrxId(); // tran_id must be unique
+
+        # CUSTOMER INFORMATION
+        $post_data['cus_name'] = $request_data['cus_name'];
+        $post_data['cus_email'] = $request_data['cus_email'];
+        $post_data['cus_add1'] = $request_data['cus_addr1'];
+        $post_data['cus_add2'] = "";
+        $post_data['cus_city'] = "";
+        $post_data['cus_state'] = "";
+        $post_data['cus_postcode'] = "";
+        $post_data['cus_country'] = "Bangladesh";
+        $post_data['cus_phone'] = '880' . $request_data['cus_phone'];
+        $post_data['cus_fax'] = "";
+
+        # SHIPMENT INFORMATION
+        $post_data['ship_name'] = "Store Test";
+        $post_data['ship_add1'] = "Dhaka";
+        $post_data['ship_add2'] = "Dhaka";
+        $post_data['ship_city'] = "Dhaka";
+        $post_data['ship_state'] = "Dhaka";
+        $post_data['ship_postcode'] = "1000";
+        $post_data['ship_phone'] = "";
+        $post_data['ship_country'] = "Bangladesh";
+
+        $post_data['shipping_method'] = "NO";
+        $post_data['product_name'] = "Computer";
+        $post_data['product_category'] = "Goods";
+        $post_data['product_profile'] = "physical-goods";
+
+        # OPTIONAL PARAMETERS
+        $post_data['value_a'] = "ref001";
+        $post_data['value_b'] = "ref002";
+        $post_data['value_c'] = "ref003";
+        $post_data['value_d'] = "ref004";
+
+
+        #Before  going to initiate the payment order status need to update as Pending.
+
+        $user = $request->user();
+        $user->transactions()->updateOrCreate([
+            'name' => $post_data['cus_name'],
+            'email' => $post_data['cus_email'],
+            'phone' => $post_data['cus_phone'],
+            'amount' => $post_data['total_amount'],
+            'status' => 'Pending',
+            'address' => $post_data['cus_add1'],
+            'transaction_id' => $post_data['tran_id'],
+            'transaction_type' => 'withdraw',
+            'currency' => $post_data['currency']
+        ]);
+
+        $sslc = new SslCommerzNotification();
+        # initiate(Transaction Data , false: Redirect to SSLCOMMERZ gateway/ true: Show all the Payement gateway here )
+        $payment_options = $sslc->makePayment($post_data, 'checkout', 'json');
+
+        if (!is_array($payment_options)) {
+            print_r($payment_options);
+            $payment_options = array();
+        }
+    }
+
     public function success(Request $request)
     {
         echo "Transaction is Successful";
@@ -219,9 +310,17 @@ class SslCommerzPaymentController extends Controller
                 $transaction = $user->transactions()
                     ->where('transaction_id', $tran_id)->first();
 
-                $user->update([
-                    'balance' => $user->balance + $transaction->amount
-                ]);
+                if ($transaction->transaction_type === 'deposit') {
+                    $user->update([
+                        'balance' => $user->balance + $transaction->amount
+                    ]);
+                }
+
+                if ($transaction->transaction_type === 'withdraw') {
+                    $user->update([
+                        'balance' => $user->balance - $transaction->amount
+                    ]);
+                }
 
                 // Saving the data to the transaction Details table
                 $current_transaction = Transaction::where('transaction_id', $tran_id)->first();

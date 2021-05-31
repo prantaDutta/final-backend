@@ -371,6 +371,16 @@ class UserController extends Controller
         }
         if ($info === 'close') {
             try {
+                if ($user->loans->where('loan_mode', 'ongoing')) {
+                    return response()->json([
+                        "ERROR"
+                    ], 422);
+                }
+                if ((int) $user->balance > 0) {
+                    return response()->json([
+                        "ERROR"
+                    ], 422);
+                }
                 $user->delete();
                 return response()->json(["OK"]);
             } catch (Exception) {

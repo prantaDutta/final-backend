@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\VerificationResource;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,15 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     Route::get('/balance', static function (Request $request) {
         return response()->json([
             'balance' => $request->user()->balance,
+        ]);
+    });
+
+    // Get Monthly Due Data
+    Route::get('/due-balance', static function (Request $request) {
+        $user = $request->user();
+        $installment = $user->installments->where('status', 'due')->first();
+        return response()->json([
+            'amount' => $installment->total_amount,
         ]);
     });
 
@@ -61,6 +71,12 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
 
     // Deposit Routes
     Route::get('/deposit', [SslCommerzPaymentController::class, 'exampleEasyCheckout']);
+
+    // Withdraw Routes
+    Route::get('/withdraw', [SslCommerzPaymentController::class, 'exampleEasyWithdraw']);
+
+    // Check if withdrawal possible
+    Route::get('/check-before-withdrawal/{amount}', [TransactionController::class, 'checkBeforeWithdrawal']);
 
     // Get All Deposit Transactions
     Route::get('/get-all-deposits', [TransactionController::class, 'getAllDeposits']);
@@ -102,7 +118,7 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     Route::get('/get-all-installments/{type}', [InstallmentController::class, 'getAllInstallments']);
 
     // get single loan for one user
-    Route::get('/get-single-loan/{id}',[LoanController::class, 'getSingleLoan']);
+    Route::get('/get-single-loan/{id}', [LoanController::class, 'getSingleLoan']);
 
     // get loan installments
     Route::get('/loans/loan-installments/{loan_id}', [LoanController::class, 'getLoanInstallments']);

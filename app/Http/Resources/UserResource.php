@@ -24,7 +24,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'mobileNo' => substr((string)$this->mobile_no, 3),
-            'mobileNoVerified' => $mobileNoVerifiedAt,
+            'mobileNo Verified' => $mobileNoVerifiedAt,
             'role' => $this->role,
             'balance' => $this->balance,
             'verified' => $this->verified,

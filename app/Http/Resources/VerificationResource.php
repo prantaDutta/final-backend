@@ -24,13 +24,13 @@ class VerificationResource extends JsonResource
 
 
         return [
-            'dateOfBirth' => $date_of_birth,
+            'date Of Birth' => $date_of_birth,
             'gender' => $this->gender,
             'address' => $this->address,
-            'borrowerType' => $this->borrower_type ?: "N/A",
+            'borrower Type' => $this->borrower_type ?: "N/A",
             'division' => $this->division,
             'zila' => $this->zila,
-            'zipCode' => $this->zip_code,
+            'zip Code' => $this->zip_code,
 //            'verificationPhotos' => $this->verification_photos,
         ];
     }
