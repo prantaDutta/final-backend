@@ -78,6 +78,7 @@ class InstallmentController extends Controller
 
             if ($due_installment_due_date->lt($installment_due_date)) {
                 $flag = true;
+                break;
             }
         }
 
