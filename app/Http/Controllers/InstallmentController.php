@@ -48,7 +48,7 @@ class InstallmentController extends Controller
     }
 
     # Pay Installment
-    public function payInstallment(Request $request) //: JsonResponse
+    public function payInstallment(Request $request) : JsonResponse
     {
         $amount = (int) $request->get('amount');
         $id = $request->get('id');
@@ -102,7 +102,7 @@ class InstallmentController extends Controller
         $current_loan = $installment->loan;
 
         // finding every lender
-        foreach ($current_loan->lender_data as $key => $lender_datum) {
+        foreach ($current_loan->lender_data as $lender_datum) {
             // finding the lender installment row
             $lender_installment = Installment::where('loan_id', $current_loan->id)
                 ->where('installment_no', $installment->installment_no)
