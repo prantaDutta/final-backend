@@ -496,13 +496,23 @@ class UserController extends Controller
     {
         $user = $request->user();
         $amount = $request->get('maximumDistributedAmount');
-        if ($amount === null) {
-            return $this->error();
+        $autoPayments = $request->get('autoPayments');
+
+        if ($amount !== null) {
+            $user->loan_preference()->update([
+                'maximum_distributed_amount' => $amount,
+            ]);
+            return response()->json(["OK"]);
         }
-        $user->loan_preference()->update([
-            'maximum_distributed_amount' => $amount,
-        ]);
-        return response()->json(["OK"]);
+
+        if ($autoPayments !== null) {
+            $user->loan_preference()->update([
+                'auto_payments' => $autoPayments,
+            ]);
+            return response()->json(["OK"]);
+        }
+
+        return response()->json(["ERROR"], 500);
     }
 
     /**

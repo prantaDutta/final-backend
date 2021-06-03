@@ -32,13 +32,16 @@ class Kernel extends ConsoleKernel
         $schedule->command('backup:run')->daily()->at('01:30');
         // Control the loan limit of the lenders
         $schedule->command('command:control-loan-limit')->daily()->at('03:00');
+        // auto-payments of borrower's due installments
+        $schedule->command('command:auto-payments')->daily();
         // The following command is for testing purpose only
         // It will be disabled in production
         if (App::environment('local')) {
             $schedule->command('command:manage-installments')->withoutOverlapping();
+            $schedule->command('command:auto-payments')->withoutOverlapping();
         }
         // set installment penalties and make them due from unpaid
-//        $schedule->command('command:manage-installments')->daily();
+        $schedule->command('command:manage-installments')->daily();
     }
 
     /**

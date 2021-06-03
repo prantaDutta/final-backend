@@ -56,11 +56,22 @@ class TransactionController extends Controller
     public function checkBeforeWithdrawal(Request $request, $amount): JsonResponse
     {
         $user = $request->user();
-        if ($user->verified === 'verified' && (int)$user->balance >= (int)$amount) {
-            return response()->json(["OK"]);
+        if ((int)$user->balance < (int)$amount) {
+            return response()->json([
+                "error" => "You don't have that much"
+            ], 422);
         }
 
-        return response()->json(["You don't have that much"], 422);
+        if ($user->role === 'borrower') {
+            $installment = $user->installments->where('status', 'due')->first();
+            if ($installment !== null) {
+                return response()->json([
+                    "error" => "Please Pay the due installments first"
+                ], 422);
+            }
+        }
+
+        return response()->json(["OK"]);
     }
 
     // Withdraw Money

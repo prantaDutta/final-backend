@@ -21,6 +21,7 @@ class CreateLoanPreferencesTable extends Migration
                 ->onDelete('cascade');
 //            $table->string('distributed_amounts')->nullable();
             $table->integer('maximum_distributed_amount')->nullable();
+            $table->enum('auto_payments', ['yes', 'no'])->default('no');
             $table->timestamps();
         });
     }

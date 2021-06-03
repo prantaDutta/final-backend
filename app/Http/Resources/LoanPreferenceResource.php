@@ -18,7 +18,8 @@ class LoanPreferenceResource extends JsonResource
         return [
             'id' => $this->id,
             'userId' => $this->user_id,
-            'maximumDistributedAmount' => $this->maximum_distributed_amount
+            'maximumDistributedAmount' => $this->maximum_distributed_amount,
+            'autoPayments' => $this->auto_payments
         ];
     }
 }

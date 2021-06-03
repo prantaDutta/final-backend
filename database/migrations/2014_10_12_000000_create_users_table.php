@@ -11,7 +11,7 @@ class CreateUsersTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('users', static function (Blueprint $table) {
             $table->id();
@@ -24,7 +24,6 @@ class CreateUsersTable extends Migration
             $table->enum('verified', ['verified', 'unverified', 'pending'])->default('unverified');
             $table->decimal('balance', 12)->nullable();
             $table->string('password');
-            $table->enum('language', ['English', 'বাংলা'])->default('English');
             $table->rememberToken();
             $table->timestamps();
         });
@@ -35,7 +34,7 @@ class CreateUsersTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('users');
     }

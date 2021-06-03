@@ -49,20 +49,20 @@ class SpecialSeeder extends Seeder
      */
     public function run(UtilController $util): void
     {
-        $decider = random_int(0, 2);
-        if ($decider === 0) {
-            $mode = 'processing';
-        } else if ($decider === 1) {
-            $mode = 'ongoing';
-        } else {
-            $mode = 'finished';
-        }
-        $loan_amount = random_int(1000, 9999);
-        $loan_duration = random_int(1, 18);
-        $interest_rate = random_int(5, 15);
-        $interest = $loan_amount * ($interest_rate / 100);
-        $company_fees = $loan_amount * 0.02;
-        $loan_start_date = Carbon::today()->subDays(random_int(0, 365));
+//        $decider = random_int(0, 2);
+//        if ($decider === 0) {
+//            $mode = 'processing';
+//        } else if ($decider === 1) {
+//            $mode = 'ongoing';
+//        } else {
+//            $mode = 'finished';
+//        }
+//        $loan_amount = random_int(1000, 9999);
+//        $loan_duration = random_int(1, 18);
+//        $interest_rate = random_int(5, 15);
+//        $interest = $loan_amount * ($interest_rate / 100);
+//        $company_fees = $loan_amount * 0.02;
+//        $loan_start_date = Carbon::today()->subDays(random_int(0, 365));
 
         $users = [
             [
@@ -111,81 +111,81 @@ class SpecialSeeder extends Seeder
             ],
         ];
 
-        $generate_lender_array = new GenerateLenderDataArray();
-
+//        $generate_lender_array = new GenerateLenderDataArray();
+//
         foreach ($users as $user) {
             $createdUser = User::create($user);
-            for ($i = 0; $i < 5; $i++) {
-                if ($createdUser->id === 1
-                    || $createdUser->id === 2
-                    /* || $createdUser->id === 3 */) {
-                    continue;
-                }
-                $created_loan = Loan::create([
-                    'loan_amount' => $loan_amount,
-                    'lender_data' => $generate_lender_array->generate($loan_amount),
-                    'unique_loan_id' => $util->generateAUniqueLoanId(),
-                    'loan_mode' => $mode,
-                    'loan_duration' => $loan_duration,
-                    'interest_rate' => $interest_rate,
-                    'amount_with_interest' => $loan_amount + $interest,
-                    'company_fees' => $company_fees,
-                    'amount_with_interest_and_company_fees' => $loan_amount + $interest + $company_fees,
-                    'monthly_installment' => ($loan_amount + $interest) / $loan_duration,
-                    'monthly_installment_with_company_fees' => ($loan_amount + $interest + $company_fees) / $loan_duration,
-//                    'loan_start_date' => Carbon::today()->subDays(random_int(0, 365)),
-//                    'loan_end_date' => Carbon::today()->addMonths(random_int(3, 18)),
-                ]);
-
-                $createdUser->loans()->attach($created_loan, ['amount' => 500]);
-
-                $createdUser->transactions()->create([
-                    'name' => $this->faker->name,
-                    'email' => $this->faker->email,
-                    'phone' => 8801 . random_int(311111111, 999999999),
-                    'amount' => random_int(1000, 9999),
-                    'status' => random_int(0, 2) === 0 ? "Pending" : "Completed",
-                    'address' => $this->faker->address,
-                    'transaction_id' => $util->generateAUniqueTrxId(),
-                    'transaction_type' => random_int(0, 1) === 0 ? "deposit" : "withdraw",
-                    'currency' => "BDT",
-                ]);
-
-                $rand = random_int(0, 2);
-                $penalty_arr = [10, 20, 30, 40];
-                $status = 'unpaid';
-                if ($rand === 0) {
-                    $status = 'paid';
-                }
-                if ($rand === 1) {
-                    $status = 'due';
-                }
-                # This will give us all the ids of loan table
-                $loan_ids = Loan::where('id', '>', 0)
-                    ->pluck('id');
-                $len = count($loan_ids);
-                if ($len > 1) {
-                    $len = 1;
-                }
-//                $pos = array_search($createdUser->loans->id, (array)$loan_ids, true);
-//                unset($loan_ids[$pos]);
-                $penalty = $rand === 0 ? 0 : $penalty_arr[random_int(0, 3)];
-
-                $due_date = $rand === 0
-                    ? now()->subMonths(random_int(0, 5))
-                    : now()->addMonths(random_int(0, 5));
-
-                $createdUser->installments()->create([
-                    'amount' => 500,
-                    'status' => $status,
-                    'unique_installment_id' => $util->generateAUniqueInstallmentId(),
-                    'loan_id' => $loan_ids[random_int(1, $len)] ?? 1,
-                    'penalty_amount' => $penalty,
-                    'total_amount' => 500 + $penalty,
-                    'due_date' => $due_date,
-                    'installment_no' => random_int(1, 5),
-                ]);
-            }
+//            for ($i = 0; $i < 5; $i++) {
+//                if ($createdUser->id === 1
+//                    || $createdUser->id === 2
+//                    /* || $createdUser->id === 3 */) {
+//                    continue;
+//                }
+//                $created_loan = Loan::create([
+//                    'loan_amount' => $loan_amount,
+//                    'lender_data' => $generate_lender_array->generate($loan_amount),
+//                    'unique_loan_id' => $util->generateAUniqueLoanId(),
+//                    'loan_mode' => $mode,
+//                    'loan_duration' => $loan_duration,
+//                    'interest_rate' => $interest_rate,
+//                    'amount_with_interest' => $loan_amount + $interest,
+//                    'company_fees' => $company_fees,
+//                    'amount_with_interest_and_company_fees' => $loan_amount + $interest + $company_fees,
+//                    'monthly_installment' => ($loan_amount + $interest) / $loan_duration,
+//                    'monthly_installment_with_company_fees' => ($loan_amount + $interest + $company_fees) / $loan_duration,
+////                    'loan_start_date' => Carbon::today()->subDays(random_int(0, 365)),
+////                    'loan_end_date' => Carbon::today()->addMonths(random_int(3, 18)),
+//                ]);
+//
+//                $createdUser->loans()->attach($created_loan, ['amount' => 500]);
+//
+//                $createdUser->transactions()->create([
+//                    'name' => $this->faker->name,
+//                    'email' => $this->faker->email,
+//                    'phone' => 8801 . random_int(311111111, 999999999),
+//                    'amount' => random_int(1000, 9999),
+//                    'status' => random_int(0, 2) === 0 ? "Pending" : "Completed",
+//                    'address' => $this->faker->address,
+//                    'transaction_id' => $util->generateAUniqueTrxId(),
+//                    'transaction_type' => random_int(0, 1) === 0 ? "deposit" : "withdraw",
+//                    'currency' => "BDT",
+//                ]);
+//
+//                $rand = random_int(0, 2);
+//                $penalty_arr = [10, 20, 30, 40];
+//                $status = 'unpaid';
+//                if ($rand === 0) {
+//                    $status = 'paid';
+//                }
+//                if ($rand === 1) {
+//                    $status = 'due';
+//                }
+//                # This will give us all the ids of loan table
+//                $loan_ids = Loan::where('id', '>', 0)
+//                    ->pluck('id');
+//                $len = count($loan_ids);
+//                if ($len > 1) {
+//                    $len = 1;
+//                }
+////                $pos = array_search($createdUser->loans->id, (array)$loan_ids, true);
+////                unset($loan_ids[$pos]);
+//                $penalty = $rand === 0 ? 0 : $penalty_arr[random_int(0, 3)];
+//
+//                $due_date = $rand === 0
+//                    ? now()->subMonths(random_int(0, 5))
+//                    : now()->addMonths(random_int(0, 5));
+//
+//                $createdUser->installments()->create([
+//                    'amount' => 500,
+//                    'status' => $status,
+//                    'unique_installment_id' => $util->generateAUniqueInstallmentId(),
+//                    'loan_id' => $loan_ids[random_int(1, $len)] ?? 1,
+//                    'penalty_amount' => $penalty,
+//                    'total_amount' => 500 + $penalty,
+//                    'due_date' => $due_date,
+//                    'installment_no' => random_int(1, 5),
+//                ]);
+//            }
             $rand = random_int(0, 1);
             $createdUser->verification()->create([
                 'date_of_birth' => Carbon::now()->subYears(random_int(18, 26))->format('Y-m-d'),

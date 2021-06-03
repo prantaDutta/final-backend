@@ -38,7 +38,7 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
         $user = $request->user();
         $installment = $user->installments->where('status', 'due')->first();
         return response()->json([
-            'amount' => $installment->total_amount,
+            'amount' => $installment->total_amount ?? 0.00,
         ]);
     });
 
