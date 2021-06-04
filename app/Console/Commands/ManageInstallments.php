@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Installment;
 use App\Models\User;
+use App\Notifications\PenaltyNotification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -80,6 +81,11 @@ class ManageInstallments extends Command
                     break;
                 }
             }
+
+//            if ($due_days >= 10 && $due_days % 10 === 0) {
+//                $user = $installment->user;
+//                $user->notify(new PenaltyNotification($installment->id));
+//            }
 
             $amount = $installment->amount;
 

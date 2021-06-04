@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Library\SslCommerz\SslCommerzNotification;
 use App\Models\Transaction;
+use App\Notifications\TransactionNotification;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -257,6 +258,8 @@ class SslCommerzPaymentController extends Controller
             'currency' => $post_data['currency']
         ]);
 
+        $user->notify(new TransactionNotification());
+
         $sslc = new SslCommerzNotification();
         # initiate(Transaction Data , false: Redirect to SSLCOMMERZ gateway/ true: Show all the Payement gateway here )
         $payment_options = $sslc->makePayment($post_data, 'checkout', 'json');
@@ -307,6 +310,8 @@ class SslCommerzPaymentController extends Controller
                     ->where('transaction_id', $tran_id)
                     ->update(['status' => 'Completed']);
 
+                $user->notify(new TransactionNotification());
+
                 $transaction = $user->transactions()
                     ->where('transaction_id', $tran_id)->first();
 
@@ -352,6 +357,8 @@ class SslCommerzPaymentController extends Controller
             $user->transactions()
                 ->where('transaction_id', $tran_id)
                 ->update(['status' => 'Failed']);
+
+            $user->notify(new TransactionNotification());
             echo "validation Fail";
         } else if ($order_details->status === 'Completed') {
             /*
@@ -413,6 +420,8 @@ class SslCommerzPaymentController extends Controller
                 ->where('transaction_id', $tran_id)
                 ->update(['status' => 'Failed']);
 
+            $user->notify(new TransactionNotification());
+
             // Saving the data to the transaction Details table
             $current_transaction = Transaction::where('transaction_id', $tran_id)->first();
             $current_transaction->transaction_detail()->updateOrCreate([
@@ -464,6 +473,8 @@ class SslCommerzPaymentController extends Controller
             $user->transactions()
                 ->where('transaction_id', $tran_id)
                 ->update(['status' => 'Canceled']);
+
+            $user->notify(new TransactionNotification());
 
             // Saving the data to the transaction Details table
             $current_transaction = Transaction::where('transaction_id', $tran_id)->first();

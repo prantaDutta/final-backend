@@ -35,8 +35,6 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (config('app.use_observer') === true) {
-            User::observe(UserObserver::class);
-        }
+        User::observe(UserObserver::class);
     }
 }

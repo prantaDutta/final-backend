@@ -6,6 +6,7 @@ use App\Http\Controllers\UtilController;
 use App\Models\Loan;
 use App\Models\LoanPreference;
 use App\Models\User;
+use App\Notifications\LoanProcessedNotification;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -126,6 +127,8 @@ class LoanDistributor implements ShouldQueue
 
             $user = User::find($lender->lender_id);
 
+            $user->notify(new LoanProcessedNotification());
+
             # Attaching the loan to the lenders
             $user->loans()->attach($current_loan, [
                 'amount' => $lender->amount,
@@ -157,11 +160,8 @@ class LoanDistributor implements ShouldQueue
             $current_loan,
             $borrower_installment_amount,
         );
-//        return response()->json([
-//            'amount' => $this->amount,
-//            'distributing_amount' => $this->distributing_amount,
-//            'lender_data' => $this->lender_data
-//        ]);
+
+        $this->the_borrower->notify(new LoanProcessedNotification());
     }
 
     /**
@@ -267,12 +267,20 @@ class LoanDistributor implements ShouldQueue
         $current_loan = Loan::where('unique_loan_id', $this->unique_loan_id)
             ->first();
 
+        if ($current_loan === null) {
+            return $this->handleNotFound();
+        }
+
         $this->the_borrower->loans()
             ->attach($current_loan, ['amount' => $this->amount]);
 
         $current_loan->update([
             'loan_mode' => 'failed',
         ]);
+
+        $user = $current_loan->users->where('role', 'borrower')->first();
+
+        $user->notify(new LoanProcessedNotification());
 
         return response()->json([
             'error' => 'Null User Found',

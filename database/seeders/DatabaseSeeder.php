@@ -23,9 +23,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(SpecialSeeder::class);
-        $dispatcher = User::getEventDispatcher();
+        $user_dispatcher = User::getEventDispatcher();
+        $transaction_dispatcher = Transaction::getEventDispatcher();
         // Remove Dispatcher
         User::unsetEventDispatcher();
+        Transaction::unsetEventDispatcher();
         User::factory(1000)
             ->has(Verification::factory())
             ->has(LoanPreference::factory(), 'loan_preference')
@@ -36,6 +38,7 @@ class DatabaseSeeder extends Seeder
             ->has(Installment::factory()->count(random_int(3, 10)))
             ->create();
         // Re-add Dispatcher
-        User::setEventDispatcher($dispatcher);
+        User::setEventDispatcher($user_dispatcher);
+        Transaction::setEventDispatcher($transaction_dispatcher);
     }
 }

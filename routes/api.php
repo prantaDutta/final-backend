@@ -24,6 +24,10 @@ Route::group(['middleware' => ['web']], static function () {
     Route::post('/get-help', [UtilController::class, 'getHelp']);
 
     // This is temporary
+//    Route::get('/temp', function (){
+//        $user = \App\Models\User::find(3);
+//        return $user->notify(new \App\Notifications\DepositNotification());
+//    });
 //    Route::get('/testing-distributing/{amount}', static function ($amount) {
 //        $loan_distributor = new TestDistributor($amount, uniqid('', true));
 //        return $loan_distributor->distribute();
