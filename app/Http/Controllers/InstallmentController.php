@@ -6,7 +6,7 @@ use App\Http\Resources\InstallmentResource;
 use App\Http\Resources\LoanResource;
 use App\Http\Resources\UserResource;
 use App\Models\Installment;
-use App\Models\User;
+use App\Notifications\InstallmentPaidNotification;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -48,12 +48,12 @@ class InstallmentController extends Controller
     }
 
     # Pay Installment
-    public function payInstallment(Request $request) : JsonResponse
+    public function payInstallment(Request $request): JsonResponse
     {
-        $amount = (int) $request->get('amount');
+        $amount = (int)$request->get('amount');
         $id = $request->get('id');
-//        $user = $request->user();
-        $user = User::findOrFail(3);
+        $user = $request->user();
+//        $user = User::findOrFail(3);
 
         $user_balance = $user->balance;
         // checking whether the borrower has enough balance to pay
@@ -89,14 +89,15 @@ class InstallmentController extends Controller
         }
 
         // decrementing borrower balance
-        DB::table('users')
-            ->where('id', $user->id)
-            ->decrement('balance', $amount);
+        $user->decrement('balance', $amount);
 
         // making the installment paid
         $installment->update([
             'status' => 'paid',
         ]);
+
+        // Sending Notifications to the borrower
+        $user->notify(new InstallmentPaidNotification($installment->id));
 
         // finding the current loan
         $current_loan = $installment->loan;
@@ -127,6 +128,10 @@ class InstallmentController extends Controller
             $lender_installment->update([
                 'status' => 'paid',
             ]);
+
+            // Sending Notifications to the lender
+            $user = $lender_installment->user;
+            $user->notify(new InstallmentPaidNotification($lender_installment->id));
         }
 
         return response()->json([

@@ -20,8 +20,14 @@ Route::group(['middleware' => ['web']], static function () {
     // Verify Email
     Route::get('/verify-email/{email}/{token}', [UserController::class, 'verifyEmail']);
 
+    // Verify Forgot Password
+    Route::post('/verify-forgot-password', [UserController::class, 'verifyForgotPassword']);
+
     // Send Help
     Route::post('/get-help', [UtilController::class, 'getHelp']);
+
+    // Forgot password
+    Route::post('/forgot-password', [UserController::class, 'forgotPassword']);
 
     // This is temporary
 //    Route::get('/temp', function (){

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\TransactionDetailResource;
 use App\Http\Resources\TransactionResource;
-use App\Http\Resources\UserResource;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -13,43 +12,59 @@ use Illuminate\Http\Request;
 class TransactionController extends Controller
 {
     // get all deposits
-    public function getAllDeposits(Request $request): JsonResponse
+    public function getAllDeposits(Request $request, $status): JsonResponse
     {
         $id = $request->user()->id;
         $user = User::find($id);
-        $deposits = $user->transactions()
-            ->where('user_id', $id)
-            ->where('transaction_type', 'deposit')
-            ->orderByDesc('created_at')->get();
+
+        if ($status === 'all') {
+            $deposits = $user->transactions()
+                ->where('user_id', $id)
+                ->where('transaction_type', 'deposit')
+                ->orderByDesc('created_at')->get();
+        } else {
+            $deposits = $user->transactions()
+                ->where('user_id', $id)
+                ->where('transaction_type', 'deposit')
+                ->where('status', $status)
+                ->orderByDesc('created_at')->get();
+        }
 
         if ($deposits) {
             return response()->json([
-                'user' => new UserResource($user),
                 'transactions' => TransactionResource::collection($deposits)
-            ], 200);
+            ]);
         }
 
-        return response()->json([], 200);
+        return response()->json([]);
     }
 
     // get all withdrawals
-    public function getAllWithdrawals(Request $request): JsonResponse
+    public function getAllWithdrawals(Request $request, $status): JsonResponse
     {
         $id = $request->user()->id;
         $user = User::find($id);
-        $withdrawals = $user->transactions()
-            ->where('user_id', $id)
-            ->where('transaction_type', 'withdraw')
-            ->get();
+
+        if ($status === 'all') {
+            $withdrawals = $user->transactions()
+                ->where('user_id', $id)
+                ->where('transaction_type', 'withdraw')
+                ->get();
+        } else {
+            $withdrawals = $user->transactions()
+                ->where('user_id', $id)
+                ->where('transaction_type', 'withdraw')
+                ->where('status', $status)
+                ->get();
+        }
 
         if ($withdrawals) {
             return response()->json([
-                'user' => new UserResource($user),
                 'transactions' => TransactionResource::collection($withdrawals)
-            ], 200);
+            ]);
         }
 
-        return response()->json([], 200);
+        return response()->json([]);
     }
 
     // Check before withdrawal
@@ -127,19 +142,27 @@ class TransactionController extends Controller
     }
 
     // get single deposit
-    public function getSingleTransaction(Request $request, $type, $id) : JsonResponse
+    public function getSingleTransaction(Request $request, $type, $id): JsonResponse
     {
         if ($type === 'deposit' || $type === 'withdraw') {
             $transaction = Transaction::where('id', $id)
                 ->where('transaction_type', $type)
                 ->first();
 
+            if ($transaction === null) {
+                return response()->json([
+                    "error" => "Transaction Not Found"
+                ], 419);
+            }
+
             $user = $request->user();
 
             $authorized_user = $transaction->user()->findOrFail($user->id);
 
             if ($authorized_user === null) {
-                return response()->json(["UNAUTHORIZED"], 419);
+                return response()->json([
+                    "error" => "UNAUTHORIZED"
+                ], 419);
             }
 
             return response()->json([

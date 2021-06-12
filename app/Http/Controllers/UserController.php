@@ -10,7 +10,9 @@ use App\Models\Installment;
 use App\Models\User;
 use App\Models\Util;
 use App\Notifications\EmailVerifiedNotification;
+use App\Notifications\ForgotPasswordNotification;
 use App\Notifications\MobileNoVerifiedNotification;
+use App\Notifications\PasswordChangedNotification;
 use App\Notifications\SentMobileOTPNotification;
 use App\Notifications\SentVerifyEmailOTPNotification;
 use Carbon\Carbon;
@@ -41,18 +43,43 @@ class UserController extends Controller
         return Redirect::to($url . '/login');
     }
 
-    /**
-     * checks for unique Email
-     * @param Request $request
-     * @return Application|ResponseFactory|JsonResponse|Response
-     */
-    public function uniqueEmail(Request $request): Response|JsonResponse|Application|ResponseFactory
+    public function forgotPassword(Request $request): JsonResponse
     {
-        $user = User::where('email', $request->get('email'))->first();
-        if (!$user) {
-            return $this->error(422, "Wrong Credentials");
+        $email = $request->get('email');
+
+        try {
+            $user = User::where('email', $email)->first();
+            $uniq_id = uniqid('', true);
+            $user->util()->update([
+                'email_verify_token' => $uniq_id,
+            ]);
+            $user->notify(new ForgotPasswordNotification($user->name, $user->email, $uniq_id));
+            return response()->json(["OK"]);
+        } catch (Exception $exception) {
+            return response()->json([
+                "error" => "Email Not Found"
+            ], 422);
         }
-        return response('OK');
+    }
+
+    public function verifyForgotPassword(Request $request): JsonResponse
+    {
+        $password = $request->get('password');
+        $email = $request->get('email');
+        $token = $request->get('token');
+
+        $user = User::where('email', $email)->first();
+        $util = Util::where('email_verify_token', $token)->first();
+        if ($util && ($util->updated_at->diffInMinutes() <= 15)) {
+            $user->update([
+                'password' => bcrypt($password)
+            ]);
+
+            $user->notify(new PasswordChangedNotification());
+            return response()->json(["OK"]);
+        }
+
+        return $this->error(422, "Something Went Wrong");
     }
 
     /**
@@ -65,6 +92,20 @@ class UserController extends Controller
     protected function error($code = 500, $msg = "ERROR"): JsonResponse
     {
         return response()->json(["ERROR" => $msg], $code);
+    }
+
+    /**
+     * checks for unique Email
+     * @param Request $request
+     * @return Application|ResponseFactory|JsonResponse|Response
+     */
+    public function uniqueEmail(Request $request): Response|JsonResponse|Application|ResponseFactory
+    {
+        $user = User::where('email', $request->get('email'))->first();
+        if (!$user) {
+            return $this->error(422, "Wrong Credentials");
+        }
+        return response('OK');
     }
 
     /**
@@ -286,6 +327,19 @@ class UserController extends Controller
         ]);
     }
 
+    public function getDueBalance(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $installments= $user->installments->where('status', 'due');
+        $due_amount = 0.00;
+        foreach ($installments as $installment) {
+            $due_amount += $installment->total_amount;
+        }
+        return response()->json([
+            'amount' => $due_amount,
+        ]);
+    }
+
     /**
      * update personal settings
      * @param Request $request
@@ -376,7 +430,7 @@ class UserController extends Controller
                         "ERROR"
                     ], 422);
                 }
-                if ((int) $user->balance > 0) {
+                if ((int)$user->balance > 0) {
                     return response()->json([
                         "ERROR"
                     ], 422);

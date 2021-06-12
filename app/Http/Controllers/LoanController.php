@@ -8,6 +8,7 @@ use App\Http\Resources\LoanResource;
 use App\Models\Loan;
 use App\Models\User;
 use App\Notifications\NewLoanRequestedNotification;
+use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
@@ -87,15 +88,23 @@ class LoanController extends Controller
     {
         $user = $request->user();
 
-        $loan = Loan::findOrFail($id);
+        try {
+            $loan = Loan::findOrFail($id);
+        } catch (Exception $e) {
+            return response()->json([
+                "error" => "Loan Not Found"
+            ], 404);
+        }
 
         $authorized_user = $loan->users()->findOrFail($user->id);
 
         if ($authorized_user === null) {
-            return response()->json(["UNAUTHORIZED"], 419);
+            return response()->json([
+                "error" => "UNAUTHORIZED"
+            ], 419);
         }
 
-        $user_installments = $authorized_user->installments;
+        $user_installments = $authorized_user->installments->where('loan_id', $loan->id);
 
         $installments = '{"Total Installments": "' . count($user_installments) . '"}';
 
@@ -114,10 +123,12 @@ class LoanController extends Controller
         $authorized_user = $loan->users()->findOrFail($user->id);
 
         if ($authorized_user === null) {
-            return response()->json(["UNAUTHORIZED"], 419);
+            return response()->json([
+                "error" => "UNAUTHORIZED"
+            ], 419);
         }
 
-        $user_installments = $authorized_user->installments;
+        $user_installments = $authorized_user->installments->where('loan_id', $loan->id);
 
         return response()->json([
             'installments' => InstallmentResource::collection($user_installments),

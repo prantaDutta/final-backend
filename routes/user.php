@@ -34,13 +34,7 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     });
 
     // Get Monthly Due Data
-    Route::get('/due-balance', static function (Request $request) {
-        $user = $request->user();
-        $installment = $user->installments->where('status', 'due')->first();
-        return response()->json([
-            'amount' => $installment->total_amount ?? 0.00,
-        ]);
-    });
+    Route::get('/due-balance', [UserController::class, 'getDueBalance']);
 
     // is contact-verified
     Route::get('/contact-verified', [UserController::class, 'isContactVerified']);
@@ -79,10 +73,10 @@ Route::group(['middleware' => ['auth:sanctum']], static function () {
     Route::get('/check-before-withdrawal/{amount}', [TransactionController::class, 'checkBeforeWithdrawal']);
 
     // Get All Deposit Transactions
-    Route::get('/get-all-deposits', [TransactionController::class, 'getAllDeposits']);
+    Route::get('/get-all-deposits/{status}', [TransactionController::class, 'getAllDeposits']);
 
     // Get All Withdrawal Transactions
-    Route::get('/get-all-withdrawals', [TransactionController::class, 'getAllWithdrawals']);
+    Route::get('/get-all-withdrawals/{status}', [TransactionController::class, 'getAllWithdrawals']);
 
     // Withdraw
     Route::post('/withdraw', [TransactionController::class, 'withdraw']);

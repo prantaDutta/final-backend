@@ -311,11 +311,11 @@ class LoanDistributor implements ShouldQueue
     /**
      * incrementing loan limit
      * @param $id
-     * @return int
+     * @return void
      */
-    protected function incrementLoanLimit($id): int
+    protected function incrementLoanLimit($id): void
     {
-        return DB::table('utils')
+         DB::table('utils')
             ->where('user_id', $id)
             ->increment('loan_limit');
     }
